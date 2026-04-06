@@ -21,7 +21,7 @@ namespace PlatformGame.Enemy.Movement
                 return;
             SetMoveAnimation(speed, canMove);
             VerifyOrientationAndFlip(moveDirection, groundLM);
-            _rb.velocity = new Vector2((-1)*moveDirection * speed, _rb.velocity.y);
+            _rb.linearVelocity = new Vector2((-1)*moveDirection * speed, _rb.linearVelocity.y);
             //_rb.transform.position += Vector3.right * (-1)*_moveDirection * Time.fixedDeltaTime * speed;
         }
 

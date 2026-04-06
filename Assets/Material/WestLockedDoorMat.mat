@@ -10,6 +10,8 @@ Material:
   m_Name: WestLockedDoorMat
   m_Shader: {fileID: -6465566751694194690, guid: ae50b0d64b56069489a1344566dab898,
     type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords:
   - ETC1_EXTERNAL_ALPHA
@@ -19,6 +21,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -102,6 +105,7 @@ Material:
     m_Colors:
     - Gradient_Color_1: {r: 0.9069853, g: 0, b: 1, a: 0}
     - Gradient_Color_2: {r: 0.93412864, g: 1, b: 0, a: 0}
+    - White: {r: 1, g: 1, b: 1, a: 1}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
@@ -109,6 +113,7 @@ Material:
     - gradientColor1: {r: 1, g: 1, b: 1, a: 1}
     - gradientColor2: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!114 &5026975989901120695
 MonoBehaviour:
   m_ObjectHideFlags: 11
@@ -121,4 +126,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 2
+  version: 10

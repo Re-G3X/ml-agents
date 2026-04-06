@@ -1,0 +1,13 @@
+﻿<Solution>
+  <Project Path="Project.Game.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="Overlord.csproj" />
+  <Project Path="SpaceShooter.csproj" />
+  <Project Path="RestClient.csproj" />
+  <Project Path="Project.ScripableObjects.csproj" />
+  <Project Path="OverlordData.csproj" />
+  <Project Path="Project.Util.csproj" />
+  <Project Path="RotaryHeart.csproj" />
+  <Project Path="Firestore.csproj" />
+</Solution>

@@ -29,7 +29,7 @@ namespace PlatformGame.Enemy.Movement
 
         private bool IsOnAir()
         {
-            return Mathf.Abs(_rb.velocity.y) > Mathf.Epsilon;
+            return Mathf.Abs(_rb.linearVelocity.y) > Mathf.Epsilon;
         }
 
         public override void Move(float moveDirection, float speed, bool canMove, LayerMask groundLM)

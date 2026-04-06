@@ -27,7 +27,7 @@ namespace Enemy
         
         var bulletVelocity = (new Vector2(Mathf.Cos(angle) * transform.right.x, Mathf.Sin(angle))) * speed ;
         
-        currentBullet.GetComponent<Rigidbody2D>().velocity = bulletVelocity;
+        currentBullet.GetComponent<Rigidbody2D>().linearVelocity = bulletVelocity;
         
     }
 

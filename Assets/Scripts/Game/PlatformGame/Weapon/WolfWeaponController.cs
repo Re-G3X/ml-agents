@@ -28,7 +28,7 @@ namespace PlatformGame.Weapons.Melee
             force = force * wolfTackleForce;
             _wolfRigidBody2D.AddForce(force, ForceMode2D.Impulse);
             yield return new WaitForSeconds(attackDuration);
-            _wolfRigidBody2D.velocity = Vector2.zero;
+            _wolfRigidBody2D.linearVelocity = Vector2.zero;
         }
     }
 }

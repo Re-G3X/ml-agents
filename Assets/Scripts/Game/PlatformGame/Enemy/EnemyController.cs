@@ -76,7 +76,7 @@ namespace PlatformGame.Enemy
             if (_isPhysicsDeactivated) return;
             _enemyCollider.enabled = false;
             _enemyRigidBody.isKinematic = true;
-            _enemyRigidBody.velocity = Vector2.zero;
+            _enemyRigidBody.linearVelocity = Vector2.zero;
         }
 
         public void LoadEnemyData(TopdownEnemySO enemySo, int questId)

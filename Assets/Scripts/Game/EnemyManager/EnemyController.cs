@@ -142,17 +142,17 @@ namespace Game.GameManager
             var directionMask = new Vector2();
             if (_isRandomMovement)
             {
-                _enemyRigidBody.velocity = GetMovementVector(ref directionMask, true);
+                _enemyRigidBody.linearVelocity = GetMovementVector(ref directionMask, true);
                 if (EnemyData is TopdownEnemySO ed)
                     yield return new WaitForSeconds(ed.activeTime);
             }
             else
             {
-                _enemyRigidBody.velocity = GetMovementVector(ref directionMask, true);
+                _enemyRigidBody.linearVelocity = GetMovementVector(ref directionMask, true);
                 if (EnemyData is TopdownEnemySO ed)
                     while (timeWalked < ed.activeTime)
                     {
-                        _enemyRigidBody.velocity = GetMovementVector(ref directionMask, false);
+                        _enemyRigidBody.linearVelocity = GetMovementVector(ref directionMask, false);
                         timeWalked += Time.deltaTime;
                         yield return null;
                     }
@@ -192,7 +192,7 @@ namespace Game.GameManager
 
         private void Wait()
         {
-            _enemyRigidBody.velocity = Vector3.zero;
+            _enemyRigidBody.linearVelocity = Vector3.zero;
         }
 
         private void OnCollisionStay2D(Collision2D collision)
@@ -217,7 +217,7 @@ namespace Game.GameManager
             StopCoroutine(_walkRoutine);
             _animator.SetTrigger(DieTrigger);
             _enemyCollider.enabled = false;
-            _enemyRigidBody.velocity = Vector2.zero;
+            _enemyRigidBody.linearVelocity = Vector2.zero;
             foreach (var childCollider in _childrenCollider)
             {
                 childCollider.enabled = false;

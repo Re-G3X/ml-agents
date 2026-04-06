@@ -44,7 +44,7 @@ namespace PlatformGame.Enemy.Movement
                 moveDirection = 1f;
 
             SetMoveAnimation(speed, canMove);
-            _rb.velocity = new Vector2(moveDirection * speed, _rb.velocity.y);
+            _rb.linearVelocity = new Vector2(moveDirection * speed, _rb.linearVelocity.y);
         }
 
         private void SetMoveAnimation(float speed, bool canMove)

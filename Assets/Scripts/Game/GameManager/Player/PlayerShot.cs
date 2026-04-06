@@ -87,7 +87,7 @@ namespace Game.GameManager.Player
             var bullet = Instantiate(bulletPrefab, bulletSpawn.transform.position, bulletSpawn.transform.rotation);
             var bulletController = bullet.GetComponent<ProjectileController>();
             bulletController.ProjectileSo = ProjectileType;
-            bulletController.Shoot(bulletForceAndRotation.Force + _rigidbody2D.velocity.normalized);
+            bulletController.Shoot(bulletForceAndRotation.Force + _rigidbody2D.linearVelocity.normalized);
         }
 
         private void RotateSpawnPoint(BulletForceAndRotation bulletForceAndRotation)

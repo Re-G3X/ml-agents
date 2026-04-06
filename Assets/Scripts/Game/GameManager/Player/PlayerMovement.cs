@@ -36,7 +36,7 @@ namespace Game.GameManager.Player
 
         private void FixedUpdate()
         {
-            _rigidbody2D.velocity = _lastSpeed;
+            _rigidbody2D.linearVelocity = _lastSpeed;
         }
 
         private void Awake()
@@ -58,7 +58,7 @@ namespace Game.GameManager.Player
         protected override void StopInput(object sender, EventArgs eventArgs)
         {
             _canMove = false;
-            _rigidbody2D.velocity = Vector3.zero;
+            _rigidbody2D.linearVelocity = Vector3.zero;
         }
 
 
