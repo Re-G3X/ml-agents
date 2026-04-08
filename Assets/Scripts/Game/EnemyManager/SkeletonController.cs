@@ -14,18 +14,29 @@ namespace Game.EnemyManager
         protected override void Start()
         {
             base.Start();
-            OriginalColor = enemyColorPalette.MainColorD;
-            GetComponent<SpriteRenderer>().color = OriginalColor;
-            var movementColor = GetColorBasedOnMovement();
-            Armor.GetComponent<SpriteRenderer>().color = movementColor;
-            if (Sword.activeSelf)
+
+            // Check if we have the palette and movement data before coloring
+            if (enemyColorPalette != null)
             {
-                Sword.GetComponent<SpriteRenderer>().color = movementColor;
-                Handle.GetComponent<SpriteRenderer>().color = movementColor;
-            }
-            else if (Shield.activeSelf)
-            {
-                Shield.GetComponent<SpriteRenderer>().color = movementColor;
+                OriginalColor = enemyColorPalette.MainColorD;
+                GetComponent<SpriteRenderer>().color = OriginalColor;
+
+                // Only try to color equipment if movement data exists
+                if (EnemyData != null && EnemyData.movement != null)
+                {
+                    var movementColor = GetColorBasedOnMovement();
+                    if (Armor != null) Armor.GetComponent<SpriteRenderer>().color = movementColor;
+                    
+                    if (Sword != null && Sword.activeSelf)
+                    {
+                        Sword.GetComponent<SpriteRenderer>().color = movementColor;
+                        Handle.GetComponent<SpriteRenderer>().color = movementColor;
+                    }
+                    else if (Shield != null && Shield.activeSelf)
+                    {
+                        Shield.GetComponent<SpriteRenderer>().color = movementColor;
+                    }
+                }
             }
         }
 

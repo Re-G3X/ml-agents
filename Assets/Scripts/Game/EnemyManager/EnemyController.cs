@@ -161,11 +161,22 @@ namespace Game.GameManager
 
         private bool IsRandomMovement()
         {
+            // Safety Check: If data is missing (common in training), default to true
+            if (EnemyData == null || EnemyData.movement == null) 
+            {
+                Debug.LogWarning("EnemyData missing on " + gameObject.name + ". Defaulting to Random Movement.");
+                return true; 
+            }
             return EnemyData.movement.name.Contains("Random");
         }
 
         private Vector2 GetMovementVector(ref Vector2 directionMask, bool updateMask)
         {
+            // If training/arena doesn't provide data, don't crash, just stand still
+            if (EnemyData == null || EnemyData.movement == null || PlayerObj == null)
+            {
+                return Vector2.zero;
+            }
             int xOffset, yOffset;
             var playerPosition = (Vector2)PlayerObj.transform.position;
             var targetMoveDir = EnemyData.movement.movementType(playerPosition, gameObject.transform.position, ref directionMask, updateMask);
@@ -227,8 +238,13 @@ namespace Game.GameManager
         private void InvokeEnemyKilledEvents()
         {
             EnemyKilledHandler?.Invoke(this, EnemyData);
-            ((IQuestElement) this).OnQuestTaskResolved(this, new QuestKillEnemyEventArgs(EnemyData.weapon, QuestId));
-            KillEnemyEventHandler?.Invoke(this, new KillEnemyEventArgs( EnemyData.movement.enemyMovementIndex, EnemyData.weapon.Type));
+            
+            // Check if this is a "real" game enemy with quest data
+            if (EnemyData != null && EnemyData.movement != null && EnemyData.weapon != null)
+            {
+                ((IQuestElement) this).OnQuestTaskResolved(this, new QuestKillEnemyEventArgs(EnemyData.weapon, QuestId));
+                KillEnemyEventHandler?.Invoke(this, new KillEnemyEventArgs(EnemyData.movement.enemyMovementIndex, EnemyData.weapon.Type));
+            }
         }
 
         public void Die()

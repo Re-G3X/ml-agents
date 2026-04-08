@@ -22,7 +22,7 @@ namespace Game.DataCollection
         
         private void Awake()
         {
-            CurrentDungeon = new();
+            CurrentDungeon = ScriptableObject.CreateInstance<DungeonData>();
         }
 
         private void OnEnable()

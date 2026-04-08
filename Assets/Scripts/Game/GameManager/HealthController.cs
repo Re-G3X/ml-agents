@@ -49,18 +49,32 @@ namespace Game.GameManager
         public void ApplyDamage(int damage, Vector3 impactDirection, int enemyIndex = -1)
         {
             if (_isInvincible) return;
-            _spriteRenderer.color = Color.red;
+            if (_spriteRenderer != null) _spriteRenderer.color = Color.red;
+            
             health -= damage;
             _isInvincible = true;
             _invincibilityCount = 0f;
+
             if (gameObject.CompareTag("Player"))
             {
                 PlayerIsDamagedEventHandler?.Invoke(this, new PlayerIsDamagedEventArgs(enemyIndex, damage, health, impactDirection));
             }
             else if (gameObject.CompareTag("Enemy"))
             {
-                ((IQuestElement)this._enemyController).OnQuestTaskResolved(this, new QuestDamageEnemyEventArgs(_enemyController.EnemyData.weapon, damage, _enemyController.QuestId));
-                _enemyController.CheckDeath();
+                // SAFETY GATE: Check if all quest-related data exists before calling the event
+                if (_enemyController != null && 
+                    _enemyController.EnemyData != null && 
+                    _enemyController.EnemyData.weapon != null)
+                {
+                    ((IQuestElement)this._enemyController).OnQuestTaskResolved(this, 
+                        new QuestDamageEnemyEventArgs(_enemyController.EnemyData.weapon, damage, _enemyController.QuestId));
+                }
+
+                // Check for death so the enemy can actually be destroyed
+                if (_enemyController != null)
+                {
+                    _enemyController.CheckDeath();
+                }
             }
         }
 

@@ -16,11 +16,16 @@ namespace Game.LevelManager.DungeonLoader
 {
     public class DungeonLoader : MonoBehaviour
     {
-        // public static EventHandler OnDungeonLoaded;
+        [Header("ML-Agents Training Override")]
+        public bool isTrainingMode = false;
+        public RoomBhv manualTrainingRoom; // Drag your scene room here
+        public DungeonFileSo trainingDungeonData; // A dummy SO for the data
+        
+        // --- Existing Variables ---
         public static List<int> finalRoomKeyIds = new List<int>();
         protected static Map _dungeonMap;
         public List<RoomBhv> roomPrefabs;
-        public Dictionary<Coordinates, RoomBhv> RoomBhvMap; //2D array for easy room indexing
+        public Dictionary<Coordinates, RoomBhv> RoomBhvMap; 
         public RoomBhv roomBehavior;
 
         public int TotalTreasures { get; private set; }
@@ -46,6 +51,11 @@ namespace Game.LevelManager.DungeonLoader
 
         public void LoadNewLevel(DungeonFileSo dungeonFileSo, QuestLineList currentQuestLineList)
         {
+            if (isTrainingMode)
+            {
+                QuickStartTraining(dungeonFileSo); 
+                return;
+            }
             Debug.Log("Loading new Level");
             LoadDungeon(dungeonFileSo);
             
@@ -64,6 +74,49 @@ namespace Game.LevelManager.DungeonLoader
             _dungeonMap.PostProcessMapData();
         }
         
+        private void Start()
+        {
+            if (isTrainingMode)
+            {
+                // We pick a random theme so the RoomBhv doesn't crash trying to find sprites
+                _selectedTheme = (Enums.RoomThemeEnum)RandomSingleton.GetInstance().Random.Next((int)Enums.RoomThemeEnum.Count);
+                
+                LoadNewLevel(trainingDungeonData, null);
+                StartCoroutine(OnStartMap("TrainingRoom"));
+            }
+        }
+
+        private void QuickStartTraining(DungeonFileSo so)
+        {
+            // 1. Setup minimal map data so the system doesn't crash elsewhere
+            Coordinates trainingCoords = new Coordinates(1, 1);
+            Vector2 roomSize = new Vector2(CurrentGeneratorSettings.RoomSize.x, CurrentGeneratorSettings.RoomSize.y);
+            _dungeonMap = new Map(so, false, roomSize, Enums.GameType.TopDown);
+            
+            _dungeonMap.FinalRoomCoordinates = trainingCoords; 
+            _dungeonMap.StartRoomCoordinates = trainingCoords;
+
+            RoomBhvMap = new Dictionary<Coordinates, RoomBhv>();
+
+            // 2. Link your manual room to the map logic
+            if (_dungeonMap.DungeonPartByCoordinates.ContainsKey(trainingCoords))
+            {
+                manualTrainingRoom.dungeonRoom = _dungeonMap.DungeonPartByCoordinates[trainingCoords] as DungeonRoom;
+            }
+
+            RoomBhvMap.Add(trainingCoords, manualTrainingRoom);
+            TotalTreasures = 0; 
+
+            // 3. Prevent the Tile/Sprite crash
+            manualTrainingRoom.SetTheme(_selectedTheme);
+
+            // 4. THE WAKE-UP CALL
+            // This starts the Enemy AI routines by simulating the player entering the room
+            manualTrainingRoom.OnRoomEnter();
+
+            Debug.Log("Gym Initialized: Manual room activated.");
+        }
+
         public IEnumerator OnStartMap(string mapName)
         {
             yield return null;

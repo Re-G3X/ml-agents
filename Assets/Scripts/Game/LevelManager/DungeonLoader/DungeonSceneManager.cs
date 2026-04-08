@@ -42,9 +42,25 @@ namespace Game.LevelManager.DungeonLoader
         protected void Start()
         {
             PlayBackgroundMusic();
-            SetGameOverCurrentLevel();
-            LoadSecondaryScenes();
-            StartCoroutine(_dungeonLoader.OnStartMap(_currentDungeonSo.BiomeName));
+            
+            // Only run these if we have valid level data
+            if (selectedLevels != null && selectedLevels.GetCurrentLevel() != null)
+            {
+                SetGameOverCurrentLevel();
+                LoadSecondaryScenes();
+
+                // Check if the SO exists before accessing BiomeName
+                if (_currentDungeonSo != null)
+                {
+                    StartCoroutine(_dungeonLoader.OnStartMap(_currentDungeonSo.BiomeName));
+                }
+            }
+            else
+            {
+                Debug.Log("DungeonSceneManager: No level data found. Skipping procedural start (Arena Mode).");
+                // Manually load UI if it's missing in Arena Mode
+                LoadSecondaryScenes(); 
+            }
         }
 
         protected virtual void PlayBackgroundMusic()

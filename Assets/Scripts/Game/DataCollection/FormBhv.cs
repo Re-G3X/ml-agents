@@ -4,11 +4,14 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using Game.GameManager;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 namespace Game.DataCollection
 {
     public class FormBhv : MonoBehaviour
     {
+        [Header("Form Settings")]
         [SerializeField] private bool _hasCheckbox = false;
         public FormQuestionsData enQuestionsData;
         public FormQuestionsData ptQuestionsData;
@@ -17,20 +20,101 @@ namespace Game.DataCollection
         public RectTransform questionsPanel;
         public RectTransform submitButton;
         public float extraQuestionsPanelHeight = 100;
+        
+        [Header("Form ID (0=Pre, 1=Post)")]
+        public int formID; 
+
         private List<FormQuestionBhv> questions = new List<FormQuestionBhv>();
         private FormCheckboxBhv checkboxForm;
-        public int formID; //0 for pretest, 1 for posttest
+        private List<int> answers;
 
         private FormQuestionsData questionsData => GameManagerSingleton.Instance.IsInPortuguese ? ptQuestionsData : enQuestionsData;
-        private List<int> answers;
 
         public static event FormAnsweredEvent PreTestFormQuestionAnsweredEventHandler;
         public static event FormAnsweredEvent PostTestFormQuestionAnsweredEventHandler;
 
         void Start()
         {
+            // 1. Make the UI invisible immediately
+            CanvasGroup cg = GetComponent<CanvasGroup>();
+            if (cg != null) 
+            {
+                cg.alpha = 0; 
+                cg.interactable = false;
+                cg.blocksRaycasts = false;
+            }
+            else 
+            {
+                transform.position = new Vector3(-10000, -10000, 0);
+            }
+
+            // 2. Start the automated sequence
+            StartCoroutine(GhostFlow());
+        }
+
+        IEnumerator GhostFlow()
+        {
+            yield return new WaitForSeconds(0.2f);
+            
+            // 1. Setup the dummy data
             InstantiateForms();
-            ResizeFormsHeight();
+            foreach (var q in questions)
+            {
+                if (q.questionData != null) q.questionData.answer = 1; 
+            }
+
+            // 2. Surgical Shutdown for Arena Mode
+            if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode)
+            {
+                Debug.Log("Arena Mode: Surgical shutdown of generators.");
+                MonoBehaviour[] allScripts = FindObjectsOfType<MonoBehaviour>();
+                foreach (var script in allScripts)
+                {
+                    if (script == null) continue;
+
+                    string typeName = script.GetType().Name;
+                    
+                    // TARGETS: These are the heavy procedural scripts causing the lag
+                    bool isGenerator = typeName.Contains("GeneratorManager") || 
+                                       typeName.Contains("PcgController") || 
+                                       typeName.Contains("QuestGenerator");
+
+                    // PROTECTED: Do NOT disable these or the game breaks/silences
+                    bool isEssential = typeName.Contains("ExperimentController") || 
+                                       typeName.Contains("Audio") || 
+                                       typeName.Contains("GameManager") ||
+                                       typeName.Contains("Singleton") ||
+                                       typeName.Contains("DungeonLoader");
+
+                    if (isGenerator && !isEssential)
+                    {
+                        script.StopAllCoroutines();
+                        script.enabled = false; 
+                        
+                        // We only deactivate the object if it's purely a generator holder
+                        // This prevents accidentally disabling objects with multiple scripts
+                        if (typeName.Contains("Manager")) 
+                        {
+                            script.gameObject.SetActive(false);
+                        }
+                        Debug.Log($"Surgical Kill: {typeName}");
+                    }
+                }
+            }
+
+            // 3. Submit and Transition
+            Submit(); 
+            
+            yield return new WaitForSeconds(0.1f);
+
+            if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode)
+            {
+                SceneManager.LoadScene("ML-Agents-Env"); 
+            }
+            else
+            {
+                SceneManager.LoadScene("ContentGenerator");
+            }
         }
                 
         public void Submit()
@@ -45,12 +129,15 @@ namespace Game.DataCollection
 
         private void InstantiateForms()
         {
+            if (questionsData == null) return;
+
             foreach (FormQuestionData q in questionsData.questions)
             {
                 GameObject g = Instantiate(questionPrefab);
-                g.GetComponent<FormQuestionBhv>().LoadData(q);
+                var qBhv = g.GetComponent<FormQuestionBhv>();
+                qBhv.LoadData(q);
                 g.transform.SetParent(questionsPanel);
-                questions.Add(g.GetComponent<FormQuestionBhv>());
+                questions.Add(qBhv);
             }
         }
 
@@ -65,7 +152,6 @@ namespace Game.DataCollection
                 GameObject g = Instantiate(checkboxPrefab);
                 g.transform.SetParent(questionsPanel);
                 checkboxForm = g.GetComponent<FormCheckboxBhv>();
-
                 panelHeight += checkboxPrefab.GetComponent<RectTransform>().rect.height;
             }
 
@@ -75,27 +161,22 @@ namespace Game.DataCollection
 
         private List<int> GetIntListFromFormQuestionBhvList(List<FormQuestionBhv> questions)
         {
-            List<int> answers = new List<int>();
-
+            List<int> answersList = new List<int>();
             foreach (FormQuestionBhv q in questions)
             {
-                answers.Add(q.questionData.answer);
+                answersList.Add(q.questionData.answer);
                 q.ResetToggles();
             }
-
-            return answers;
+            return answersList;
         }
 
         private void GetToggleAnswersFromFormCheckboxBhv(FormCheckboxBhv checkboxForm)
         {
-            if (_hasCheckbox)
+            if (_hasCheckbox && checkboxForm != null)
             {
                 foreach (Toggle t in checkboxForm.toggles)
                 {
-                    if (t.isOn)
-                        answers.Add(-1);
-                    else
-                        answers.Add(-2);
+                    answers.Add(t.isOn ? -1 : -2);
                 }
             }
         }
@@ -103,7 +184,9 @@ namespace Game.DataCollection
         private void SendFormToRightEventHandler(int formID)
         {
             if (formID == 1)
+            {
                 PostTestFormQuestionAnsweredEventHandler?.Invoke(null, new FormAnsweredEventArgs(formID, answers));
+            }
             else
             {
                 PreTestFormQuestionAnsweredEventHandler?.Invoke(this, new FormAnsweredEventArgs(formID, answers));
