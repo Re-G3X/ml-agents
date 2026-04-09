@@ -704,11 +704,28 @@ PrefabInstance:
       propertyPath: m_Name
       value: Skeleton(Clone)
       objectReference: {fileID: 0}
+    - target: {fileID: 4548531199706321587, guid: 6d064525b0287c649b0dbfbe219cdef8,
+        type: 3}
+      propertyPath: <PlayerObj>k__BackingField
+      value: 
+      objectReference: {fileID: 2057696068}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6d064525b0287c649b0dbfbe219cdef8, type: 3}
+--- !u!114 &513601572 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4548531199706321587, guid: 6d064525b0287c649b0dbfbe219cdef8,
+    type: 3}
+  m_PrefabInstance: {fileID: 513601571}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ab09ad76a974b36ad296ccb0565c5c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &514499396
 GameObject:
   m_ObjectHideFlags: 0
@@ -721,6 +738,7 @@ GameObject:
   - component: {fileID: 514499398}
   - component: {fileID: 514499397}
   - component: {fileID: 514499400}
+  - component: {fileID: 514499401}
   m_Layer: 0
   m_Name: DungeonManager
   m_TagString: Untagged
@@ -793,6 +811,20 @@ MonoBehaviour:
   currentQuestLines: {fileID: 0}
   maxTreasure: 0
   selectedLevels: {fileID: 11400000, guid: 706ff28979181224c984c0358ea8acbd, type: 2}
+--- !u!114 &514499401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 514499396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18859ab3f7ce0334c887be87cd6a16b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Game::ArenaManager
+  theSkeleton: {fileID: 513601572}
+  trainerStats: {fileID: 11400000, guid: 2a216a9425d8bef40882b405ac796d88, type: 2}
 --- !u!224 &601733949 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5504058185986819796, guid: 9581c0fe0430a1a4b84bef62380ed023,
@@ -1339,6 +1371,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1069801140}
   m_CullTransparentMesh: 0
+--- !u!1 &1202135047
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1202135049}
+  - component: {fileID: 1202135048}
+  m_Layer: 0
+  m_Name: MissingScriptChecker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1202135048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1202135047}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49be5674844660b4cbae6be3389686f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Game::NewMonoBehaviourScript
+--- !u!4 &1202135049
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1202135047}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 9.01373, y: 4.18662, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &1206473705 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7416396612373760025, guid: 9581c0fe0430a1a4b84bef62380ed023,
@@ -2948,6 +3024,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8fea4dd3f18348d42a4a32bb977123cd, type: 3}
+--- !u!1 &2057696068 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1772544863890580, guid: 8fea4dd3f18348d42a4a32bb977123cd,
+    type: 3}
+  m_PrefabInstance: {fileID: 2057696067}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -2960,3 +3042,4 @@ SceneRoots:
   - {fileID: 514499399}
   - {fileID: 513601571}
   - {fileID: 381114962}
+  - {fileID: 1202135049}

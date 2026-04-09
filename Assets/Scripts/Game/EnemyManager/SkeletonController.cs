@@ -42,14 +42,27 @@ namespace Game.EnemyManager
 
         public override void LoadEnemyData(EnemySO enemyData, int questId)
         {
+            // 1. Force the assignment here so the Skeleton definitely has the reference
+            this.EnemyData = enemyData; 
+
+            // 2. Run the base logic (movement, health setup, etc.)
             base.LoadEnemyData(enemyData, questId);
+
+            // 3. Safety Check: If the SO or Weapon is missing, stop before crashing
+            if (EnemyData == null || EnemyData.weapon == null)
+            {
+                Debug.LogError($"Skeleton AI: EnemyData or Weapon is null on {gameObject.name}!");
+                return;
+            }
+
+            // 4. Now the switch is safe
             switch (EnemyData.weapon.name)
             {
                 case "Sword":
-                    Sword.SetActive(true);
+                    if (Sword != null) Sword.SetActive(true);
                     break;
                 case "Shield":
-                    Shield.SetActive(true);
+                    if (Shield != null) Shield.SetActive(true);
                     break;
             }
         }

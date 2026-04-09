@@ -64,8 +64,18 @@ namespace Game.GameManager
             {
                 GetAllComponents();
             }
-            _isRandomMovement = IsRandomMovement();
-            _walkRoutine = StartCoroutine(WalkAndWait());
+
+            // Only start moving if we have data. 
+            // In the Arena/Gym, this will usually be NULL at Start()
+            if (EnemyData != null && EnemyData.movement != null)
+            {
+                _isRandomMovement = IsRandomMovement();
+                _walkRoutine = StartCoroutine(WalkAndWait());
+            }
+            else
+            {
+                Debug.Log($"[AI] {gameObject.name} waiting for data load...");
+            }
         }
 
         private void GetAllComponents()
@@ -172,33 +182,47 @@ namespace Game.GameManager
 
         private Vector2 GetMovementVector(ref Vector2 directionMask, bool updateMask)
         {
-            // If training/arena doesn't provide data, don't crash, just stand still
+            // 1. Safety Check: If we are missing critical objects, don't crash.
             if (EnemyData == null || EnemyData.movement == null || PlayerObj == null)
-            {
                 return Vector2.zero;
-            }
-            int xOffset, yOffset;
+
             var playerPosition = (Vector2)PlayerObj.transform.position;
-            var targetMoveDir = EnemyData.movement.movementType(playerPosition, gameObject.transform.position, ref directionMask, updateMask);
-            targetMoveDir.Normalize();
-            if (targetMoveDir.x > 0)
-                xOffset = 1;
-            else if (targetMoveDir.x < 0)
-                xOffset = -1;
+            var currentPosition = (Vector2)gameObject.transform.position;
+            Vector2 targetMoveDir;
+
+            // 2. Determine Direction
+            if (EnemyData.movement.movementType != null)
+            {
+                targetMoveDir = EnemyData.movement.movementType(playerPosition, currentPosition, ref directionMask, updateMask);
+            }
             else
-                xOffset = 0;
-            if (targetMoveDir.y > 0)
-                yOffset = 1;
-            else if (targetMoveDir.y < 0)
-                yOffset = -1;
-            else
-                yOffset = 0;
-            targetMoveDir = new Vector2((targetMoveDir.x + xOffset), (targetMoveDir.y + yOffset));
+            {
+                targetMoveDir = (playerPosition - currentPosition).normalized;
+                Debug.LogWarning($"[AI] Movement delegate was null on {EnemyData.movement.name}. Using fallback follow logic.");
+            }
+
+            // 3. Determine Speed
+            float finalSpeed = 0f;
 
             if (EnemyData is TopdownEnemySO ed)
-                return new Vector2(targetMoveDir.x * ed.movementSpeed, targetMoveDir.y * ed.movementSpeed);
-            Debug.Log("EnemyData is not a TopdownEnemySO, check the enemy generator's output");
-            return new Vector2();
+            {
+                finalSpeed = ed.movementSpeed;
+            }
+            else 
+            {
+                // Use Status 3 because the converter maps it to movementSpeed
+                finalSpeed = EnemyData.status3;
+            }
+
+            // 4. Final Safety: If speed is still 0 (from the SO), provide a default 
+            // so we can actually see if the physics are working.
+            if (finalSpeed <= 0) 
+            {
+                finalSpeed = 3.0f; 
+                Debug.Log($"[AI] Speed was 0 on {EnemyData.name}, using safety speed of 3.0");
+            }
+
+            return targetMoveDir * finalSpeed;
         }
 
         private void Wait()
@@ -258,10 +282,22 @@ namespace Game.GameManager
             {
                 GetAllComponents();
             }
+            
             EnemyData = enemyData;
+            
             if (EnemyData is TopdownEnemySO ed)
                 _healthController.SetHealth(ed.health);
+                
             QuestId = questId;
+
+            // KICKSTART MOVEMENT: Now that we have data, we can safely start walking
+            if (EnemyData != null && EnemyData.movement != null)
+            {
+                if (_walkRoutine != null) StopCoroutine(_walkRoutine); 
+                _isRandomMovement = IsRandomMovement();
+                _walkRoutine = StartCoroutine(WalkAndWait());
+                Debug.Log($"[AI] {gameObject.name} data received. Starting movement.");
+            }
         }
 
         protected Color GetColorBasedOnMovement()
