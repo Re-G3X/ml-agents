@@ -51,7 +51,7 @@ namespace Game.GameManager.Player
 
         private void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
         {
-            if (scene.name == "Overworld" || scene.name == "LevelWithEnemies")
+            if (scene.name == "Overworld" || scene.name == "LevelWithEnemies" || scene.name == "ML-Agents-Env")
             {
                 playerCollider.enabled = true;
             }

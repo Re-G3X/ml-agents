@@ -63,6 +63,7 @@ namespace Game.GameManager
             PlayerController.PlayerDeathEventHandler -= OnRunComplete;
             TriforceBhv.GotTriforceEventHandler -= OnRunComplete;
 
+            if (_questLinesListForProfile == null) return;
             _questLinesListForProfile.Clear();
         }
 

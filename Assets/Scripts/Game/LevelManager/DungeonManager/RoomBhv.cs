@@ -98,7 +98,7 @@ namespace Game.LevelManager.DungeonManager
 
         public List<Vector3> spawnPoints;
 
-        protected Vector3 _availablePosition;
+        public Vector3 _availablePosition;
 
         private EnemyLoader _enemyLoader;
 
@@ -234,6 +234,8 @@ namespace Game.LevelManager.DungeonManager
         protected virtual void SetCollidersOnRoom()
         {
 	        SetSpritesTheme();
+            if (dungeonRoom == null) return;
+
 	        colNorth.transform.localPosition = new Vector2(dungeonRoom.Dimensions.Width/2f, -0.5f);
 	        colSouth.transform.localPosition = new Vector2(dungeonRoom.Dimensions.Width/2f, dungeonRoom.Dimensions.Height+0.5f);
 	        colEast.transform.localPosition = new Vector2(dungeonRoom.Dimensions.Width+0.5f, dungeonRoom.Dimensions.Height/2f);
@@ -356,7 +358,11 @@ namespace Game.LevelManager.DungeonManager
                 minimapIcon.GetComponent<SpriteRenderer>().color = Constants.VisitedColor;
                 _hasBeenVisited = true;
             }
+            
+            if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode) return;
+
             EnterRoomEventHandler?.Invoke(this, new EnterRoomEventArgs(dungeonRoom.Coordinates, dungeonRoom.Dimensions, enemiesDictionary, transform.position));
+            
             ((IQuestElement) this).OnQuestTaskResolved(this, new QuestExploreRoomEventArgs( dungeonRoom.Coordinates, QuestId ));
         }
 
@@ -544,7 +550,7 @@ namespace Game.LevelManager.DungeonManager
 
                 // FIX: Always fire the StartRoom event in manual mode so the player "wakes up"
                 // We use the current position because there is no procedural tile data.
-                StartRoomEventHandler?.Invoke(this, new StartRoomEventArgs(transform.position));
+                StartRoomEventHandler?.Invoke(this, new StartRoomEventArgs(_availablePosition));
                 
                 _hasBeenVisited = true;
                 return; 

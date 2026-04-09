@@ -293,7 +293,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea7d7495833204790ba1d3a8755397f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ConversionMode: 0
 --- !u!1001 &381114962
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -307,15 +306,250 @@ PrefabInstance:
       propertyPath: m_Name
       value: Room(Clone)
       objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: doorEast
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: doorNorth
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: hasEnemies
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: manualMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: _availablePosition.x
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: _availablePosition.y
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: _availablePosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: spawnPoints.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.totalEnemies
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: spawnPoints.Array.data[0].x
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: spawnPoints.Array.data[0].y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.<HasItemPreference>k__BackingField
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.enemiesByType.enemiesByType.isExpanded
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.enemiesByType.enemiesByType.reqReferences
+      value: 
+      objectReference: {fileID: 11400000, guid: 3d6785e46e940b843aa5fbe4ca729d60,
+        type: 2}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.items.itemAmountBySo.reorderableList.canAdd
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.enemiesByType.enemiesByType._keys.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.enemiesByType.enemiesByType._values.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.items.itemAmountBySo.reorderableList.canRemove
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.items.itemAmountBySo.reorderableList.draggable
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: 'dungeonRoom.enemiesByType.enemiesByType._keys.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 9825d811d256b7b4eaaec1b081b78374,
+        type: 2}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: 'dungeonRoom.enemiesByType.enemiesByType._keys.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 47b8db2b014647145bdbd766c2640dfe,
+        type: 2}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.items.itemAmountBySo.reorderableList.expandable
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.items.itemAmountBySo.reorderableList.slideEasing
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.enemiesByType.enemiesByType._keyValues.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.items.itemAmountBySo.reorderableList.footerHeight
+      value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.items.itemAmountBySo.reorderableList.headerHeight
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.items.itemAmountBySo.reorderableList.label.m_Text
+      value: Keys
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.enemiesByType.enemiesByType.reorderableList.canAdd
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: 'dungeonRoom.enemiesByType.enemiesByType._keyValues.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 9825d811d256b7b4eaaec1b081b78374,
+        type: 2}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: 'dungeonRoom.enemiesByType.enemiesByType._keyValues.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 47b8db2b014647145bdbd766c2640dfe,
+        type: 2}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.items.itemAmountBySo.reorderableList.verticalSpacing
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.enemiesByType.enemiesByType.reorderableList.canRemove
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.enemiesByType.enemiesByType.reorderableList.draggable
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.enemiesByType.enemiesByType.reorderableList.expandable
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.enemiesByType.enemiesByType.reorderableList.isExpanded
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.items.itemAmountBySo.reorderableList.multipleSelection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.enemiesByType.enemiesByType.reorderableList.slideEasing
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.enemiesByType.enemiesByType.reorderableList.footerHeight
+      value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.enemiesByType.enemiesByType.reorderableList.headerHeight
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.enemiesByType.enemiesByType.reorderableList.label.m_Text
+      value: Keys
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.items.itemAmountBySo.reorderableList.showDefaultBackground
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.enemiesByType.enemiesByType.reorderableList.verticalSpacing
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.enemiesByType.enemiesByType.reorderableList.multipleSelection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.items.itemAmountBySo.reorderableList.label.m_TextWithWhitespace
+      value: "Keys\u200B"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.enemiesByType.enemiesByType.reorderableList.showDefaultBackground
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3574050669079851939, guid: b797fe9c37038924c8d520f1dc4be47b,
+        type: 3}
+      propertyPath: dungeonRoom.enemiesByType.enemiesByType.reorderableList.label.m_TextWithWhitespace
+      value: "Keys\u200B"
+      objectReference: {fileID: 0}
     - target: {fileID: 4533829020627990078, guid: b797fe9c37038924c8d520f1dc4be47b,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -2.2
       objectReference: {fileID: 0}
     - target: {fileID: 4533829020627990078, guid: b797fe9c37038924c8d520f1dc4be47b,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -7
       objectReference: {fileID: 0}
     - target: {fileID: 4533829020627990078, guid: b797fe9c37038924c8d520f1dc4be47b,
         type: 3}
@@ -358,7 +592,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 7743574415619404838, guid: b797fe9c37038924c8d520f1dc4be47b, type: 3}
+    - {fileID: 2134980229688716285, guid: b797fe9c37038924c8d520f1dc4be47b, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b797fe9c37038924c8d520f1dc4be47b, type: 3}
@@ -416,12 +652,12 @@ PrefabInstance:
     - target: {fileID: 2541137610263529739, guid: 6d064525b0287c649b0dbfbe219cdef8,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 13.6
+      value: 10.7
       objectReference: {fileID: 0}
     - target: {fileID: 2541137610263529739, guid: 6d064525b0287c649b0dbfbe219cdef8,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 11.3
+      value: 4.4
       objectReference: {fileID: 0}
     - target: {fileID: 2541137610263529739, guid: 6d064525b0287c649b0dbfbe219cdef8,
         type: 3}
