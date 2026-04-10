@@ -85,19 +85,21 @@ namespace Game.DataCollection
                                        typeName.Contains("GameManager") ||
                                        typeName.Contains("Singleton") ||
                                        typeName.Contains("DungeonLoader");
-
+                    
                     if (isGenerator && !isEssential)
                     {
                         script.StopAllCoroutines();
                         script.enabled = false; 
-                        
-                        // We only deactivate the object if it's purely a generator holder
-                        // This prevents accidentally disabling objects with multiple scripts
-                        if (typeName.Contains("Manager")) 
+                        Debug.Log($"Surgical Kill (Script Only): {typeName}");
+
+                        // Only deactivate the object if it's a dedicated procedural holder
+                        // Avoid deactivating general "Manager" objects that might house combat logic
+                        if (typeName == "GeneratorManager" || typeName == "PcgController") 
                         {
+                            // Optional: Only do this if it has no other essential scripts
                             script.gameObject.SetActive(false);
+                            Debug.Log($"Object Shutdown: {script.gameObject.name}");
                         }
-                        Debug.Log($"Surgical Kill: {typeName}");
                     }
                 }
             }

@@ -59,6 +59,7 @@ namespace Game.GameManager.Player
 
         private void CheckDeath(object sender, PlayerIsDamagedEventArgs eventArgs)
         {
+            // Always play the blood particles so we can see the hit
             var mainParticle = bloodParticle.main;
             mainParticle.startSpeed = 0;
             var forceOverLifetime = bloodParticle.forceOverLifetime;
@@ -66,9 +67,22 @@ namespace Game.GameManager.Player
             forceOverLifetime.x = eventArgs.ImpactDirection.x * 20;
             forceOverLifetime.y = eventArgs.ImpactDirection.y * 20;
             forceOverLifetime.z = eventArgs.ImpactDirection.z * 20;
-
             bloodParticle.Play();
+
+            // If health is still > 0, do nothing
             if (eventArgs.PlayerHealth > 0) return;
+
+            // --- ADD THIS BLOCK HERE ---
+            // Check our Singleton to see if we should actually "die"
+            if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode)
+            {
+                Debug.Log("[Arena] Death prevented. Resetting health via Arena Mode bypass.");
+                ResetHealth(); // This heals the player back to max
+                return;        // EXIT EARLY: This prevents the 'PlayerDeathEventHandler' below from firing!
+            }
+            // ----------------------------
+
+            // Original death logic (Scene will only freeze/skeleton only disappears if we reach here)
             SceneLoaded?.Invoke(null, EventArgs.Empty);
             playerCollider.enabled = false;
             PlayerDeathEventHandler?.Invoke(null, EventArgs.Empty);

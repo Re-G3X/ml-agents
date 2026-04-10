@@ -825,6 +825,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Game::ArenaManager
   theSkeleton: {fileID: 513601572}
   trainerStats: {fileID: 11400000, guid: 2a216a9425d8bef40882b405ac796d88, type: 2}
+  playerHealth: {fileID: 2057696069}
+  trainingEnemyData: {fileID: 11400000, guid: 2a216a9425d8bef40882b405ac796d88, type: 2}
 --- !u!224 &601733949 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5504058185986819796, guid: 9581c0fe0430a1a4b84bef62380ed023,
@@ -3030,6 +3032,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 2057696067}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2057696069 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2376619585032857282, guid: 8fea4dd3f18348d42a4a32bb977123cd,
+    type: 3}
+  m_PrefabInstance: {fileID: 2057696067}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2057696068}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78b6a48cb1ec2a14fb16f518b7315b8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

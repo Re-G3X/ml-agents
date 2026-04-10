@@ -232,11 +232,50 @@ namespace Game.GameManager
 
         private void OnCollisionStay2D(Collision2D collision)
         {
-            var collisionDirection = Vector3.Normalize(gameObject.transform.position - collision.gameObject.transform.position);
             if (!collision.gameObject.CompareTag("Player")) return;
+
+            var collisionDirection = Vector3.Normalize(gameObject.transform.position - collision.gameObject.transform.position);
             OnPlayerHit();
-            if (EnemyData is TopdownEnemySO ed)
-                collision.gameObject.GetComponent<HealthController>().ApplyDamage(ed.damage, collisionDirection, IndexOnEnemyList);
+
+            int finalDamage = 0;
+
+            if (EnemyData != null)
+            {
+                // 1. Search for a FIELD named 'damage' (Scanning all base classes)
+                var field = EnemyData.GetType().GetField("damage", 
+                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | 
+                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.FlattenHierarchy);
+
+                if (field != null)
+                {
+                    finalDamage = Mathf.RoundToInt(System.Convert.ToSingle(field.GetValue(EnemyData)));
+                }
+                else 
+                {
+                    // 2. Search for a PROPERTY named 'damage' (in case it's {get; set;})
+                    var prop = EnemyData.GetType().GetProperty("damage", 
+                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | 
+                        System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.FlattenHierarchy);
+                    
+                    if (prop != null)
+                    {
+                        finalDamage = Mathf.RoundToInt(System.Convert.ToSingle(prop.GetValue(EnemyData)));
+                    }
+                }
+            }
+
+            if (finalDamage > 0)
+            {
+                Debug.Log($"[Arena-Success] Impact! Damage Applied: {finalDamage}");
+                collision.gameObject.GetComponent<HealthController>().ApplyDamage(finalDamage, collisionDirection, IndexOnEnemyList);
+            }
+            else
+            {
+                // This is the fallback for the Arena so your agent can still function
+                finalDamage = 1; 
+                Debug.LogWarning($"[Arena-Safety] Could not find 'damage' data. Applying safety damage of 1.");
+                collision.gameObject.GetComponent<HealthController>().ApplyDamage(finalDamage, collisionDirection, IndexOnEnemyList);
+            }
         }
 
         public void CheckDeath()
