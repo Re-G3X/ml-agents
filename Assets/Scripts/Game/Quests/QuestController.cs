@@ -117,15 +117,21 @@ namespace Game.Quests
         }
 
         #region Damage
-        private void UpdateDamageQuest ( QuestDamageEnemyEventArgs damageQuestArgs )
+        private void UpdateDamageQuest(QuestDamageEnemyEventArgs damageQuestArgs)
         {
+            // safety gate for arena mode
+            if (questLines == null || questLines.QuestLines == null) 
+            {
+                // If we're in training/arena mode, just ignore quest updates
+                return; 
+            }
+
             var enemyDamaged = damageQuestArgs.EnemyWeaponTypeSo;
             var damage = damageQuestArgs.Damage;
             var damageData = new DamageQuestData(damage, enemyDamaged);
             var questId = damageQuestArgs.QuestId;
             questLines.QuestLines.Any(questList => 
                     questList.RemoveAvailableQuestWithId<DamageQuestSo, DamageQuestData>(damageData, questId));
-            //Debug.LogError($"$No damage Quests With This Enemy ({enemyDamaged}) Available");
         }
         
         #endregion

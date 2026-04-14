@@ -20,6 +20,9 @@ namespace Game.LevelManager.DungeonManager
 {
     public class RoomBhv : MonoBehaviour, ISoundEmitter, IQuestElement
     {
+        [Header("ML-Agents Training")]
+        public bool manualMode = false; // Set to true for your training room prefab
+        
         public static event StartRoomEvent StartRoomEventHandler;
         public static event ShowRoomOnMiniMapEvent ShowRoomOnMiniMapEventHandler;
 
@@ -95,7 +98,7 @@ namespace Game.LevelManager.DungeonManager
 
         public List<Vector3> spawnPoints;
 
-        protected Vector3 _availablePosition;
+        public Vector3 _availablePosition;
 
         private EnemyLoader _enemyLoader;
 
@@ -111,12 +114,14 @@ namespace Game.LevelManager.DungeonManager
         
         private void Awake()
         {
+            if (manualMode) return; // Skip initialization if we've manually built the room
+
             hasEnemies = false;
             enemiesDictionary = new EnemyByAmountDictionary();
             _instantiatedEnemies = new List<GameObject>();
             _instantiatedKeys = new List<GameObject>();
             _hasBeenVisited = false;
-            floorTilemap.ClearAllTiles();
+            floorTilemap.ClearAllTiles(); // Only clears if not in manual mode
         }
 
         // Use this for initialization
@@ -177,6 +182,8 @@ namespace Game.LevelManager.DungeonManager
 
         protected virtual  void SetEnemySpawners()
         {
+            if (manualMode && spawnPoints.Count > 0) return; // Keep our manual points
+
             var roomPosition = transform.position;
             var xOffset = roomPosition.x;
             var yOffset = roomPosition.y;
@@ -227,6 +234,8 @@ namespace Game.LevelManager.DungeonManager
         protected virtual void SetCollidersOnRoom()
         {
 	        SetSpritesTheme();
+            if (dungeonRoom == null) return;
+
 	        colNorth.transform.localPosition = new Vector2(dungeonRoom.Dimensions.Width/2f, -0.5f);
 	        colSouth.transform.localPosition = new Vector2(dungeonRoom.Dimensions.Width/2f, dungeonRoom.Dimensions.Height+0.5f);
 	        colEast.transform.localPosition = new Vector2(dungeonRoom.Dimensions.Width+0.5f, dungeonRoom.Dimensions.Height/2f);
@@ -251,10 +260,18 @@ namespace Game.LevelManager.DungeonManager
 
         private void SetDoorsTransform()
         {
-            doorNorth.transform.localPosition = new Vector2(dungeonRoom.Dimensions.Width/2f, dungeonRoom.Dimensions.Height+0.5f);
-            doorSouth.transform.localPosition = new Vector2(dungeonRoom.Dimensions.Width/2f, -0.5f);
-            doorEast.transform.localPosition = new Vector2(dungeonRoom.Dimensions.Width+0.5f, dungeonRoom.Dimensions.Height/2f);
-            doorWest.transform.localPosition = new Vector2(-0.5f, dungeonRoom.Dimensions.Height/2f);
+            // Use the ?. operator to check if the door exists before accessing .transform
+            if (doorNorth != null)
+                doorNorth.transform.localPosition = new Vector2(dungeonRoom.Dimensions.Width / 2f, dungeonRoom.Dimensions.Height + 0.5f);
+            
+            if (doorSouth != null)
+                doorSouth.transform.localPosition = new Vector2(dungeonRoom.Dimensions.Width / 2f, -0.5f);
+            
+            if (doorEast != null)
+                doorEast.transform.localPosition = new Vector2(dungeonRoom.Dimensions.Width + 0.5f, dungeonRoom.Dimensions.Height / 2f);
+            
+            if (doorWest != null)
+                doorWest.transform.localPosition = new Vector2(-0.5f, dungeonRoom.Dimensions.Height / 2f);
         }
 
         private void OnDrawGizmos()
@@ -341,16 +358,28 @@ namespace Game.LevelManager.DungeonManager
                 minimapIcon.GetComponent<SpriteRenderer>().color = Constants.VisitedColor;
                 _hasBeenVisited = true;
             }
+            
+            if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode) return;
+
             EnterRoomEventHandler?.Invoke(this, new EnterRoomEventArgs(dungeonRoom.Coordinates, dungeonRoom.Dimensions, enemiesDictionary, transform.position));
+            
             ((IQuestElement) this).OnQuestTaskResolved(this, new QuestExploreRoomEventArgs( dungeonRoom.Coordinates, QuestId ));
         }
 
         private void SetKeysToDoors()
         {
-	        doorNorth.SetKey(northDoor);
-	        doorSouth.SetKey(southDoor);
-	        doorEast.SetKey(eastDoor);
-	        doorWest.SetKey(westDoor);
+            // If we are in Arena Mode or the doors aren't assigned, just skip this.
+            if (doorNorth == null && doorSouth == null && doorEast == null && doorWest == null)
+            {
+                return;
+            }
+
+            // Use the ?. operator (Null-conditional) to safely set keys.
+            // This way, if a door or a key-data is null, it just skips that line instead of crashing.
+            doorNorth?.SetKey(northDoor);
+            doorSouth?.SetKey(southDoor);
+            doorEast?.SetKey(eastDoor);
+            doorWest?.SetKey(westDoor);
         }
 
         private bool RoomHasKey()
@@ -508,41 +537,62 @@ namespace Game.LevelManager.DungeonManager
 
         public void SetTheme(Enums.RoomThemeEnum theme)
         {
-	        _theme = theme;
-	        SetSpritesTheme();
+            _theme = theme;
+            _transform = transform;
+            _position = _transform.position;
 
-	        SetLayout();
-	        _transform = transform;
-	        _position = _transform.position;
-	        if (RoomHasKey())
-	        {
-		        PlaceKeysInRoom();
-	        }
-	        if (RoomHasTreasure())
-	        {
-		        PlaceTreasuresInRoom();
-	        }
-	        if (RoomHasNpc())
-	        {
-		        PlaceNpcsInRoom();
-	        }
-	        if (dungeonRoom.IsStartRoom())
-	        {
-		        transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.green;
-		        minimapIcon.GetComponent<SpriteRenderer>().color = Constants.VisitedColor;
-		        GetAvailablePosition();
+            if (manualMode)
+            {
+                Debug.Log($"[{gameObject.name}] Manual Mode: Ensuring Player Initialization.");
+                
+                SetKeysToDoors(); 
+                SelectEnemies();
+
+                // FIX: Always fire the StartRoom event in manual mode so the player "wakes up"
+                // We use the current position because there is no procedural tile data.
+                StartRoomEventHandler?.Invoke(this, new StartRoomEventArgs(_availablePosition));
+                
+                _hasBeenVisited = true;
+                return; 
+            }
+
+            // --- Standard Procedural Logic follows ---
+            SetSpritesTheme();
+            SetLayout();
+                       
+            if (RoomHasKey()) PlaceKeysInRoom();
+            if (RoomHasTreasure()) PlaceTreasuresInRoom();
+            if (RoomHasNpc()) PlaceNpcsInRoom();
+
+            if (dungeonRoom.IsStartRoom())
+            {
+                ApplyFloorColor(Color.green);
+                minimapIcon.GetComponent<SpriteRenderer>().color = Constants.VisitedColor;
+                GetAvailablePosition();
                 CallStartRoomEvent();
-		        _hasBeenVisited = true;
-	        }
-	        else if (dungeonRoom.IsFinalRoom())
-	        {
-		        PlaceTriforceInRoom();
-		        transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.red;
-	        }
-	        SelectEnemies();
+                _hasBeenVisited = true;
+            }
+            else if (dungeonRoom.IsFinalRoom())
+            {
+                PlaceTriforceInRoom();
+                ApplyFloorColor(Color.red);
+            }
+            
+            SelectEnemies();
 
-	        minimapIcon.transform.localScale = new Vector3(dungeonRoom.Dimensions.Width, dungeonRoom.Dimensions.Height, 1);
-	        minimapIcon.transform.position += new Vector3(dungeonRoom.Dimensions.Width/2f, dungeonRoom.Dimensions.Height/2f, 0f);
+            // Setup Minimap
+            minimapIcon.transform.localScale = new Vector3(dungeonRoom.Dimensions.Width, dungeonRoom.Dimensions.Height, 1);
+            minimapIcon.transform.position += new Vector3(dungeonRoom.Dimensions.Width / 2f, dungeonRoom.Dimensions.Height / 2f, 0f);
+        }
+
+        // Helper to prevent Child(0) NullReferenceExceptions
+        private void ApplyFloorColor(Color color)
+        {
+            if (transform.childCount > 0)
+            {
+                var sr = transform.GetChild(0).GetComponent<SpriteRenderer>();
+                if (sr != null) sr.color = color;
+            }
         }
 
         protected virtual void CallStartRoomEvent()
@@ -552,20 +602,32 @@ namespace Game.LevelManager.DungeonManager
 
         protected virtual void SetSpritesTheme()
         {
-            doorEast.SetTheme(_theme);
-            doorWest.SetTheme(_theme);
-            doorNorth.SetTheme(_theme);
-            doorSouth.SetTheme(_theme);
-            _nwColumn = NWColumns[(int) _theme];
-            _neColumn = NEColumns[(int) _theme];
-            _swColumn = SWColumns[(int) _theme];
-            _seColumn = SEColumns[(int) _theme];
-            _blockTile = blockTiles[(int) _theme];
-            _floorTile = floorTiles[(int) _theme];
-            _northWall = northWalls[(int) _theme];
-            _southWall = southWalls[(int) _theme];
-            _eastWall = eastWalls[(int) _theme];
-            _westWall = westWalls[(int) _theme];
+            // CATCH: If we are in training or manual mode, or if critical components are missing, exit.
+            if (manualMode || floorTilemap == null || blockTilemap == null)
+            {
+                return; 
+            }
+
+            // Add null checks for every door before calling SetTheme
+            if (doorEast != null) doorEast.SetTheme(_theme);
+            if (doorWest != null) doorWest.SetTheme(_theme);
+            if (doorNorth != null) doorNorth.SetTheme(_theme);
+            if (doorSouth != null) doorSouth.SetTheme(_theme);
+            
+            // Ensure the theme index is within bounds of your lists
+            int themeIndex = (int)_theme;
+            if (themeIndex < NWColumns.Count) _nwColumn = NWColumns[themeIndex];
+            if (themeIndex < NEColumns.Count) _neColumn = NEColumns[themeIndex];
+            if (themeIndex < SWColumns.Count) _swColumn = SWColumns[themeIndex];
+            if (themeIndex < SEColumns.Count) _seColumn = SEColumns[themeIndex];
+            
+            if (themeIndex < blockTiles.Count) _blockTile = blockTiles[themeIndex];
+            if (themeIndex < floorTiles.Count) _floorTile = floorTiles[themeIndex];
+            
+            if (themeIndex < northWalls.Count) _northWall = northWalls[themeIndex];
+            if (themeIndex < southWalls.Count) _southWall = southWalls[themeIndex];
+            if (themeIndex < eastWalls.Count) _eastWall = eastWalls[themeIndex];
+            if (themeIndex < westWalls.Count) _westWall = westWalls[themeIndex];
         }
     }
 }

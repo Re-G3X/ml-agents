@@ -115,12 +115,26 @@ namespace Overlord.Events
         }
 
 
-        void Awake()
+void Awake()
         {
             if (_instance == null)
             {
                 _instance = this;
+
+                // FIX: Force the object to the root of the hierarchy
+                // so DontDestroyOnLoad doesn't throw a warning.
+                if (transform.parent != null)
+                {
+                    transform.SetParent(null);
+                }
+
                 DontDestroyOnLoad(gameObject);
+            }
+            else if (_instance != this)
+            {
+                // Safety: If another one exists, destroy this one 
+                // so we don't have duplicates.
+                Destroy(gameObject);
             }
         }
 

@@ -7,6 +7,7 @@ using UnityEngine;
 using PlatformGame.Enemy.Movement;
 using Util;
 using PlatformGame.Util;
+using Game.GameManager;
 
 namespace PlatformGame.Enemy
 {
@@ -42,6 +43,20 @@ namespace PlatformGame.Enemy
             _enemyAttack.OnStopAttacking -= EnableInput;
         }
         
+        private void Start()
+        {
+            // If we are in Arena Mode and haven't been loaded by a generator
+            if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode)
+            {
+                if (!_hasLoadedEnemy)
+                {
+                    // You'll need a reference to a default SO for this to work
+                    // LoadEnemyData(defaultEnemySO, -1); 
+                    Debug.LogWarning("Enemy detected Arena Mode: Waiting for Data Load.");
+                }
+            }
+        }
+
         private void Awake()
         {
             _enemyMovement = GetComponent<EnemyMovement>();

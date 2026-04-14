@@ -13,7 +13,9 @@ namespace Game.GameManager
 {
     public class GameManagerSingleton : MonoBehaviour, ISoundEmitter
     {
-        // TODO: Replace type code with class 
+        // 1. Updated to match your actual training scene name for consistency
+        public bool IsTraining => SceneManager.GetActiveScene().name == "ML-Agents-Env";
+        
         public bool IsInPortuguese = false;
         public Enums.GameType GameType;
         public static GameManagerSingleton Instance { get; private set; }
@@ -27,11 +29,14 @@ namespace Game.GameManager
         public static event FormAnsweredEvent PreTestFormQuestionAnsweredEventHandler;
         private bool _hasLoaded;
 
+        // This is your master switch for the GhostFlow logic
         public bool arenaMode;
 
         private void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
         {
-            if (scene.name == "Main" || scene.name == "ContentGenerator" || scene.name == "PlatformMain")
+            // 2. Add your training scene here if you want music to play while training
+            // or leave it out if you prefer silence for better performance.
+            if (scene.name == "Main" || scene.name == "ContentGenerator" || scene.name == "PlatformMain" || scene.name == "ML-Agents-Env")
             {
                 ((ISoundEmitter)this).OnSoundEmitted(this, new PlayBgmEventArgs(AudioManager.BgmTracks.MainMenuTheme));
             }
@@ -40,7 +45,6 @@ namespace Game.GameManager
             {
                 if (!_hasLoaded)
                 {
-                    // LoadStateHandler?.Invoke();
                     _hasLoaded = true;
                 }
             }
@@ -48,7 +52,6 @@ namespace Game.GameManager
 
         public void Awake()
         {
-            //Singleton
             if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
@@ -58,14 +61,9 @@ namespace Game.GameManager
             DontDestroyOnLoad(gameObject);
         }
 
-        // Use this for initialization
         private void Start()
         {
             GameStartEventHandler?.Invoke(null, EventArgs.Empty);
-            // if (SaveLoadManager.HasSaveFile())
-            {
-                // SceneManager.LoadScene(experimentSelectorScreen.SceneName);
-            }
         }
 
         private void OnApplicationQuit()
@@ -77,6 +75,7 @@ namespace Game.GameManager
         {
             SceneManager.sceneLoaded += OnLevelFinishedLoading;
         }
+        
         void OnDisable()
         {
             SceneManager.sceneLoaded -= OnLevelFinishedLoading;
@@ -84,6 +83,9 @@ namespace Game.GameManager
 
         public void MainMenu()
         {
+            // 3. Safety Check: Reset arenaMode if manually returning to Main
+            // arenaMode = false; 
+            
             GameStartEventHandler?.Invoke(null, EventArgs.Empty);
             SceneManager.LoadScene("Main");
         }

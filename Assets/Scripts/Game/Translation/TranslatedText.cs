@@ -18,6 +18,12 @@ namespace Game
 
         public void Translate()
         {
+            // Safety check: If the GameManager doesn't exist yet, abort.
+            if (GameManagerSingleton.Instance == null) 
+            {
+                return; 
+            }
+
             textMesh.text = GameManagerSingleton.Instance.IsInPortuguese ? _ptText : _enText;
         }
     }

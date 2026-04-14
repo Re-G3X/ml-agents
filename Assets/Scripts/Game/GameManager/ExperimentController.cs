@@ -63,15 +63,27 @@ namespace Game.GameManager
             PlayerController.PlayerDeathEventHandler -= OnRunComplete;
             TriforceBhv.GotTriforceEventHandler -= OnRunComplete;
 
+            if (_questLinesListForProfile == null) return;
             _questLinesListForProfile.Clear();
         }
 
         private void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
         {
+            // High-priority check: Use the Singleton to check arenaMode
+            // This is safer than FindObjectOfType because it's available the moment the scene starts
+            if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode) 
+            {
+                Debug.Log("ExperimentController: Arena/Training detected. Narrative selection bypassed.");
+                return; 
+            }
+
+            // Original logic for normal players
             if (scene.name == "ContentGenerator" && _firstRunCompleted)
             {
                 StartExperimentGeneratorEventHandler?.Invoke(null, EventArgs.Empty);
             }
+            
+            // We only start this coroutine if we aren't training
             StartCoroutine(WaitForProfileToBeLoadedAndSelectNarratives(scene));
         }
 
@@ -83,7 +95,7 @@ namespace Game.GameManager
 
         private bool CanLoadNarrativesToDungeonEntrances(Scene scene)
         {
-            return scene.name == "Overworld" && _questLinesListForProfile.Count > 0;
+            return (scene.name == "Overworld" || scene.name == "ML-Agents-Env") && _questLinesListForProfile.Count > 0;
         }
 
         private void SelectNarrativeAndSetDungeonsToEntrances()
