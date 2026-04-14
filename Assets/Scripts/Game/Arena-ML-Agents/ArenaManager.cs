@@ -1,20 +1,29 @@
 using UnityEngine;
 using Game.EnemyManager;
 using ScriptableObjects;
-using Game.GameManager; // Added to see HealthController/Player
-using Game.Events;      // Added to see the Damage Events
+using Game.GameManager;
+using Game.Events;
+using Game.GameManager.Player;
 
 public class ArenaManager : MonoBehaviour 
 {
+    [Header("Dependencies")]
     public SkeletonController theSkeleton;
-    public EnemySO trainerStats; 
-    public HealthController playerHealth; // Assign the Player's HealthController here
-    [Header("Training Data")]
-    public ScriptableObjects.EnemySO trainingEnemyData; // Drag 'StandardSword' here
-    
+    public EnemySO trainingEnemyData; 
+    public HealthController playerHealth;
+
+    [Header("Spawn Settings")]
+    public Vector2 playerSpawnPos = new Vector2(10.68f, 2.65f);
+    public Vector2 enemySpawnPos = new Vector2(6.17f, 3.50f);
+
+    [Header("Wave Settings")]
+    public int totalEnemiesInWave = 1;
+    private int _currentKills = 0;
+
+    private PlayerController _playerController;
+
     void OnEnable()
     {
-        // Subscribe to the damage event to monitor player life
         HealthController.PlayerIsDamagedEventHandler += OnPlayerDamaged;
     }
 
@@ -26,91 +35,116 @@ public class ArenaManager : MonoBehaviour
     void Start() 
     {
         if (GameManagerSingleton.Instance != null)
-        {
             GameManagerSingleton.Instance.arenaMode = true;
-        }
-        // SURGICAL KILL: Disable Quest tracking to prevent the NullReference crash on enemy death
-        var questController = FindObjectOfType<Game.Quests.QuestController>();
-        if (questController != null)
+
+        if (theSkeleton == null) theSkeleton = FindFirstObjectByType<SkeletonController>();
+        
+        var playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
         {
-            questController.enabled = false;
-            Debug.Log("[Arena] QuestController disabled to prevent Kill-Quest crash.");
+            _playerController = playerObj.GetComponent<PlayerController>();
+            playerHealth = playerObj.GetComponent<HealthController>();
         }
 
-        // 2. DESTROY THE CANVAS (Keep this, it's working!)
-        GameObject canvas = GameObject.Find("DungeonCanvas");
-        if (canvas != null)
-        {
-            Destroy(canvas);
-        }
-
-        // 3. SURGICAL KILL: Disable the other controllers
-        foreach (var dc in FindObjectsOfType<Game.DataCollection.DungeonDataController>()) dc.enabled = false;
-        foreach (var pd in FindObjectsOfType<Game.DataCollection.PlayerDataController>()) pd.enabled = false;
-
-        // Standard initialization
-        if (theSkeleton == null) theSkeleton = FindObjectOfType<SkeletonController>();
-        if (playerHealth == null) playerHealth = GameObject.FindGameObjectWithTag("Player")?.GetComponent<HealthController>();
-
+        CleanupMainGameSystems();
+        ForcePositions();
         InitializeArena();
+    }
+
+    private void CleanupMainGameSystems()
+    {
+        var questController = FindFirstObjectByType<Game.Quests.QuestController>();
+        if (questController != null) questController.enabled = false;
+
+        GameObject canvas = GameObject.Find("DungeonCanvas");
+        if (canvas != null) Destroy(canvas);
+
+        foreach (var dc in FindObjectsByType<Game.DataCollection.DungeonDataController>(FindObjectsSortMode.None)) dc.enabled = false;
+        foreach (var pd in FindObjectsByType<Game.DataCollection.PlayerDataController>(FindObjectsSortMode.None)) pd.enabled = false;
     }
 
     void InitializeArena()
     {
         if (theSkeleton != null && trainingEnemyData != null)
         {
-            // 1. Manually trigger the data load that the Generator usually does
             theSkeleton.LoadEnemyData(trainingEnemyData, 1);
-            
-            // 2. FORCE THE BRAIN TO RESTART
-            // Since we bypassed the normal start-up, the AI might be "asleep"
             theSkeleton.StopAllCoroutines();
-            
-            // We use the exact Coroutine name from your previous logs
             theSkeleton.StartCoroutine("WalkAndWait"); 
-            
-            Debug.Log($"[Arena] Injected {trainingEnemyData.name} into Skeleton and jump-started AI.");
+        }
+    }
+
+    public void RegisterKill()
+    {
+        _currentKills++;
+        Debug.Log($"[Arena] Enemy Down! Kills: {_currentKills}/{totalEnemiesInWave}");
+
+        if (_currentKills >= totalEnemiesInWave)
+        {
+            Debug.Log("[Arena] Wave Cleared! Resetting...");
+            ResetTrainingCycle();
+        }
+    }
+
+    private void ForcePositions()
+    {
+        if (_playerController != null)
+        {
+            _playerController.transform.position = playerSpawnPos;
+            // Stop physics momentum
+            if (_playerController.TryGetComponent(out Rigidbody2D rb)) rb.linearVelocity = Vector2.zero;
+        }
+
+        if (theSkeleton != null)
+        {
+            theSkeleton.transform.position = enemySpawnPos;
+            if (theSkeleton.TryGetComponent(out Rigidbody2D erb)) erb.linearVelocity = Vector2.zero;
+        }
+
+        if (Camera.main != null)
+        {
+            Camera.main.transform.position = new Vector3(playerSpawnPos.x, playerSpawnPos.y, Camera.main.transform.position.z);
         }
     }
 
     private void OnPlayerDamaged(object sender, PlayerIsDamagedEventArgs e)
     {
-        // Check if player just reached 0 or less HP
-        if (e.PlayerHealth <= 0)
-        {
-            Debug.Log("[Arena] Player has died! Resetting for training...");
-            ResetTrainingCycle();
-        }
+        if (e.PlayerHealth <= 0) ResetTrainingCycle();
     }
 
-    private void ResetTrainingCycle()
+    public void ResetTrainingCycle()
     {
-        // 1. USE THE PLAYER'S OWN RESET LOGIC
-        // This calls the ResetHealth() in the script you just showed me!
-        var playerController = GameObject.FindGameObjectWithTag("Player")?.GetComponent<Game.GameManager.Player.PlayerController>();
-        if (playerController != null)
-        {
-            playerController.ResetHealth();
-            
-            // 2. RE-ENABLE THE COLLIDER
-            // CheckDeath turns this off; we MUST turn it back on.
-            var collider = playerController.GetComponent<Collider2D>();
-            if (collider != null) collider.enabled = true;
-        }
-
-        // 3. UNFREEZE TIME
+        _currentKills = 0;
         Time.timeScale = 1.0f;
 
-        // 4. BRING BACK THE SKELETON
+        // RESET PLAYER
+        if (_playerController != null)
+        {
+            _playerController.ResetHealth(); // Resets PlayerController state
+            if (_playerController.TryGetComponent(out HealthController pHealth))
+            {
+                pHealth.ResetHealth(); // Resets the invincibility lock!
+            }
+        }
+
+        // RESET SKELETON
         if (theSkeleton != null)
         {
             theSkeleton.gameObject.SetActive(true);
-            theSkeleton.enabled = true;
             
-            // Reset position so he doesn't just stand on top of the player
-            theSkeleton.transform.position = new Vector3(2, 0, 0); 
+            if (theSkeleton.TryGetComponent(out HealthController eHealth))
+            {
+                eHealth.ResetHealth();
+            }
+
+            if (theSkeleton.TryGetComponent(out Animator anim))
+            {
+                anim.Rebind(); // THIS CLEARS THE DEATH ANIMATION STATE
+                anim.Update(0f);
+            }
+            
+            theSkeleton.enabled = true;
         }
 
-        Debug.Log("[Arena] Reset complete using PlayerController.ResetHealth().");
+        ForcePositions();
     }
 }

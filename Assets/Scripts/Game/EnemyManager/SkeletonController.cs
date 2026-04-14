@@ -42,34 +42,60 @@ namespace Game.EnemyManager
 
         public override void LoadEnemyData(EnemySO enemyData, int questId)
         {
-            // 1. Force the assignment here so the Skeleton definitely has the reference
+            // 1. Assign the data reference
             this.EnemyData = enemyData; 
 
-            // 2. Run the base logic (movement, health setup, etc.)
-            base.LoadEnemyData(enemyData, questId);
+            // 2. Resolve the Health Value
+            int initialHealth = 1; // Fallback safety
 
-            // 3. Safety Check: If the SO or Weapon is missing, stop before crashing
-            if (EnemyData == null || EnemyData.weapon == null)
+            if (enemyData is TopdownEnemySO topdownData)
             {
-                Debug.LogError($"Skeleton AI: EnemyData or Weapon is null on {gameObject.name}!");
-                return;
+                // If it's already a TopdownSO, use the explicit health field
+                initialHealth = topdownData.health;
+            }
+            else
+            {
+                // Otherwise, use the status1 mapping confirmed by your conversion script
+                initialHealth = (int)enemyData.status1;
             }
 
-            // 4. Now the switch is safe
-            switch (EnemyData.weapon.name)
+            // 3. Force the HealthController to capture this as MAX and CURRENT
+            if (TryGetComponent(out HealthController h))
             {
-                case "Sword":
-                    if (Sword != null) Sword.SetActive(true);
-                    break;
-                case "Shield":
-                    if (Shield != null) Shield.SetActive(true);
-                    break;
+                h.SetHealth(initialHealth);
+                
+                if (enemyColorPalette != null) 
+                    h.SetOriginalColor(enemyColorPalette.MainColorD);
+            }
+
+            // 4. Run base class logic
+            base.LoadEnemyData(enemyData, questId);
+
+            // 5. Equipment Logic (unchanged)
+            if (EnemyData != null && EnemyData.weapon != null)
+            {
+                switch (EnemyData.weapon.name)
+                {
+                    case "Sword":
+                        if (Sword != null) Sword.SetActive(true);
+                        break;
+                    case "Shield":
+                        if (Shield != null) Shield.SetActive(true);
+                        break;
+                }
             }
         }
 
         protected override void StartDeath()
         {
             base.StartDeath();
+            
+            if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode)
+            {
+                // Send the "amountOfKills += 1" message
+                Object.FindAnyObjectByType<ArenaManager>()?.RegisterKill();
+            }
+
             if (Sword.activeSelf)
             {
                 Sword.GetComponent<Animator>().SetTrigger(DieTrigger);
