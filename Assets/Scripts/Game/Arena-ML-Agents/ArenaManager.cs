@@ -1,26 +1,23 @@
 using UnityEngine;
-using Game.EnemyManager;
-using ScriptableObjects;
+using System.Collections.Generic;
 using Game.GameManager;
 using Game.Events;
 using Game.GameManager.Player;
+using ScriptableObjects;
 
 public class ArenaManager : MonoBehaviour 
 {
-    [Header("Dependencies")]
-    public SkeletonController theSkeleton;
-    public EnemySO trainingEnemyData; 
-    public HealthController playerHealth;
+    [Header("Training Entities")]
+    public List<EnemyController> trainingEnemies = new List<EnemyController>();
+    public List<TopdownEnemySO> trainingEnemyData = new List<TopdownEnemySO>(); 
 
     [Header("Spawn Settings")]
     public Vector2 playerSpawnPos = new Vector2(10.68f, 2.65f);
     public Vector2 enemySpawnPos = new Vector2(6.17f, 3.50f);
 
-    [Header("Wave Settings")]
-    public int totalEnemiesInWave = 1;
-    private int _currentKills = 0;
-
     private PlayerController _playerController;
+    private HealthController _playerHealth;
+    private int _remainingEnemies = 0;
 
     void OnEnable()
     {
@@ -37,17 +34,14 @@ public class ArenaManager : MonoBehaviour
         if (GameManagerSingleton.Instance != null)
             GameManagerSingleton.Instance.arenaMode = true;
 
-        if (theSkeleton == null) theSkeleton = FindFirstObjectByType<SkeletonController>();
-        
         var playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
         {
             _playerController = playerObj.GetComponent<PlayerController>();
-            playerHealth = playerObj.GetComponent<HealthController>();
+            _playerHealth = playerObj.GetComponent<HealthController>();
         }
 
         CleanupMainGameSystems();
-        ForcePositions();
         InitializeArena();
     }
 
@@ -65,24 +59,82 @@ public class ArenaManager : MonoBehaviour
 
     void InitializeArena()
     {
-        if (theSkeleton != null && trainingEnemyData != null)
+        Debug.Log($"[Arena] Checking Lists -> Enemies: {trainingEnemies.Count} | Data: {trainingEnemyData.Count}");
+
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player"); 
+
+        for (int i = 0; i < trainingEnemies.Count; i++)
         {
-            theSkeleton.LoadEnemyData(trainingEnemyData, 1);
-            theSkeleton.StopAllCoroutines();
-            theSkeleton.StartCoroutine("WalkAndWait"); 
+            var enemy = trainingEnemies[i];
+            if (enemy == null) {
+                Debug.LogError($"[Arena] Enemy at index {i} is NULL!");
+                continue;
+            }
+
+            if (playerObj != null) enemy.target = playerObj.transform;
+
+            if (i < trainingEnemyData.Count)
+            {
+                Debug.Log($"[Arena] Calling LoadEnemyData for {enemy.gameObject.name} with {trainingEnemyData[i].name}");
+                enemy.LoadEnemyData(trainingEnemyData[i], 1);
+                // FORCE ENABLE: If the script was stuck, this toggle triggers OnEnable/Start logic again
+                enemy.enabled = false;
+                enemy.enabled = true;
+            }
+            else
+            {
+                Debug.LogError($"[Arena] No Data found for enemy at index {i}! trainingEnemyData list is too small.");
+            }
+
+            _remainingEnemies++;
         }
+        ForcePositions();
     }
 
     public void RegisterKill()
     {
-        _currentKills++;
-        Debug.Log($"[Arena] Enemy Down! Kills: {_currentKills}/{totalEnemiesInWave}");
-
-        if (_currentKills >= totalEnemiesInWave)
+        _remainingEnemies--;
+        if (_remainingEnemies <= 0)
         {
-            Debug.Log("[Arena] Wave Cleared! Resetting...");
             ResetTrainingCycle();
         }
+    }
+
+    public void ResetTrainingCycle()
+    {
+        if (_playerController != null)
+        {
+            _playerController.ResetHealth(); 
+            if (_playerHealth != null) _playerHealth.ResetHealth();
+        }
+
+        Transform playerTransform = _playerController != null ? _playerController.transform : null;
+
+        for (int i = 0; i < trainingEnemies.Count; i++)
+        {
+            var enemy = trainingEnemies[i];
+            if (enemy == null) continue;
+
+            enemy.gameObject.SetActive(true);
+            if (playerTransform != null) enemy.target = playerTransform;
+            if (enemy.TryGetComponent(out HealthController eHealth)) eHealth.ResetHealth();
+            
+            if (enemy.TryGetComponent(out Animator anim))
+            {
+                anim.Rebind();
+                anim.Update(0f);
+            }
+            
+            enemy.enabled = true;
+            
+            if (i < trainingEnemyData.Count)
+            {
+                enemy.LoadEnemyData(trainingEnemyData[i], 1);
+            }
+        }
+
+        _remainingEnemies = trainingEnemies.Count;
+        ForcePositions();
     }
 
     private void ForcePositions()
@@ -90,14 +142,16 @@ public class ArenaManager : MonoBehaviour
         if (_playerController != null)
         {
             _playerController.transform.position = playerSpawnPos;
-            // Stop physics momentum
             if (_playerController.TryGetComponent(out Rigidbody2D rb)) rb.linearVelocity = Vector2.zero;
         }
 
-        if (theSkeleton != null)
+        foreach (var enemy in trainingEnemies)
         {
-            theSkeleton.transform.position = enemySpawnPos;
-            if (theSkeleton.TryGetComponent(out Rigidbody2D erb)) erb.linearVelocity = Vector2.zero;
+            if (enemy != null)
+            {
+                enemy.transform.position = enemySpawnPos;
+                if (enemy.TryGetComponent(out Rigidbody2D erb)) erb.linearVelocity = Vector2.zero;
+            }
         }
 
         if (Camera.main != null)
@@ -109,42 +163,5 @@ public class ArenaManager : MonoBehaviour
     private void OnPlayerDamaged(object sender, PlayerIsDamagedEventArgs e)
     {
         if (e.PlayerHealth <= 0) ResetTrainingCycle();
-    }
-
-    public void ResetTrainingCycle()
-    {
-        _currentKills = 0;
-        Time.timeScale = 1.0f;
-
-        // RESET PLAYER
-        if (_playerController != null)
-        {
-            _playerController.ResetHealth(); // Resets PlayerController state
-            if (_playerController.TryGetComponent(out HealthController pHealth))
-            {
-                pHealth.ResetHealth(); // Resets the invincibility lock!
-            }
-        }
-
-        // RESET SKELETON
-        if (theSkeleton != null)
-        {
-            theSkeleton.gameObject.SetActive(true);
-            
-            if (theSkeleton.TryGetComponent(out HealthController eHealth))
-            {
-                eHealth.ResetHealth();
-            }
-
-            if (theSkeleton.TryGetComponent(out Animator anim))
-            {
-                anim.Rebind(); // THIS CLEARS THE DEATH ANIMATION STATE
-                anim.Update(0f);
-            }
-            
-            theSkeleton.enabled = true;
-        }
-
-        ForcePositions();
     }
 }

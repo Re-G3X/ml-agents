@@ -15,68 +15,109 @@ namespace Game.GameManager
     {
         [field: SerializeField] protected int IndexOnEnemyList { get; set; }
         [field: SerializeField] protected GameObject PlayerObj { get; set; }
-
+        [field: SerializeField] protected ColorPaletteSo enemyColorPalette;
         [SerializeField] private ParticleSystem bloodParticle;
         [field: SerializeField] protected ParticleSystem CureParticle { get; set; }
-
+        public Transform target;
+        private bool _isAIActive = false;
+        protected bool isResetting = false;
         private BehaviorType behavior;
         protected static readonly int DieTrigger = Animator.StringToHash("Die");
         private Animator _animator;
         private Color _originalColor;
-        [field: SerializeField] protected ColorPaletteSo enemyColorPalette;
         public EnemySO EnemyData { get; set; }
         public int QuestId { get; set; }
-
         private Vector2 _directionMask;
-
-        protected Color OriginalColor
-        {
-            get => _originalColor;
-            set
-            {
-                _originalColor = value;
-                if (_healthController != null)
-                {
-                    _healthController.SetOriginalColor(_originalColor);
-                }
-            }
-        }
         private float _lastX, _lastY;
         private HealthController _healthController;
         private Rigidbody2D _enemyRigidBody;
         private Collider2D[] _childrenCollider;
         private Collider2D _enemyCollider;
         private bool _isRandomMovement;
-
         public static event EventHandler PlayerHitEventHandler;
         public static event KillEnemyEvent KillEnemyEventHandler;
-
         private bool _hasGotComponents;
-
         public EventHandler<EnemySO> EnemyKilledHandler;
-
         private Coroutine _walkRoutine;
-
+        
+        // end of variables //
 
         protected virtual void Start()
         {
-            if (!_hasGotComponents)
+            // We no longer start the routine here. 
+            // Start() is now only for internal component safety.
+            if (!_hasGotComponents) GetAllComponents();
+        }
+
+        private void FixedUpdate()
+        {
+            // 1. REACTIVE GATE: Check if we have data/target yet
+            if (!_isAIActive)
             {
-                GetAllComponents();
+                CheckReadiness();
             }
 
-            // Only start moving if we have data. 
-            // In the Arena/Gym, this will usually be NULL at Start()
-            if (EnemyData != null && EnemyData.movement != null)
+            // 2. PHYSICS CONSISTENCY: Ensure we stop moving if resetting
+            if (isResetting && _enemyRigidBody != null)
             {
-                _isRandomMovement = IsRandomMovement();
-                _walkRoutine = StartCoroutine(WalkAndWait());
-            }
-            else
-            {
-                Debug.Log($"[AI] {gameObject.name} waiting for data load...");
+                _enemyRigidBody.linearVelocity = Vector2.zero;
             }
         }
+
+        protected virtual void CheckReadiness()
+        {
+            // Access the Singleton state
+            bool isArena = GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode;
+
+            if (_isAIActive) return; 
+
+            if (EnemyData != null && PlayerObj != null)
+            {
+                StartAI();
+            }
+            else if (isArena) 
+            {
+                // In Arena, we allow it to start 'empty' so it doesn't just stand there,
+                // but our LoadEnemyData fix will now properly REBOOT this later.
+                IsRandomMovement(); 
+                StartAI();
+            }
+        }
+
+        protected virtual void StartAI()
+        {
+            // FINAL CHECK: If ArenaManager just injected data, make sure we use it!
+            if (EnemyData == null && GameManagerSingleton.Instance.arenaMode) 
+            {
+                // Try to wait one more frame or check if data is coming
+                // For now, let's just log it.
+            }
+
+            _isAIActive = true;
+            Debug.Log($"[AI] {gameObject.name} Logic Activated.");
+            
+            // Safety: Stop any existing routine before starting a new one
+            if (_walkRoutine != null) StopCoroutine(_walkRoutine);
+            _walkRoutine = StartCoroutine(WalkAndWait());
+        }
+
+        private void OnEnable()
+        {
+            PlayerController.PlayerDeathEventHandler += PlayerHasDied;
+        }
+
+        private void OnDisable()
+        {
+            PlayerController.PlayerDeathEventHandler -= PlayerHasDied;
+        }
+
+        // \/ check later if this method is really necessary \/
+        private void PlayerHasDied(object sender, EventArgs eventArgs)
+        {
+            StartDeath();
+        }
+
+
 
         private void GetAllComponents()
         {
@@ -92,16 +133,6 @@ namespace Game.GameManager
         protected virtual void Awake()
         {
             _hasGotComponents = false;
-        }
-
-        private void OnEnable()
-        {
-            PlayerController.PlayerDeathEventHandler += PlayerHasDied;
-        }
-
-        private void OnDisable()
-        {
-            PlayerController.PlayerDeathEventHandler -= PlayerHasDied;
         }
 
         private void OnPlayerHit()
@@ -130,11 +161,6 @@ namespace Game.GameManager
             bloodParticle.Play();
         }
 
-        private void PlayerHasDied(object sender, EventArgs eventArgs)
-        {
-            StartDeath();
-        }
-
         private IEnumerator WalkAndWait()
         {
             while (true)
@@ -142,7 +168,7 @@ namespace Game.GameManager
                 if (EnemyData is TopdownEnemySO ed)
                     yield return new WaitForSeconds(ed.restTime);
                 yield return StartCoroutine(Walk());
-                Wait();
+                _enemyRigidBody.linearVelocity = Vector3.zero; // old wait() function (which contained only this line of code)
             }
         }
 
@@ -182,100 +208,43 @@ namespace Game.GameManager
 
         private Vector2 GetMovementVector(ref Vector2 directionMask, bool updateMask)
         {
-            // 1. Safety Check: If we are missing critical objects, don't crash.
-            if (EnemyData == null || EnemyData.movement == null || PlayerObj == null)
+            // 1. Modified Safety: We only NEED EnemyData and PlayerObj. 
+            // We don't strictly need .movement if we have a fallback!
+            if (EnemyData == null || PlayerObj == null)
                 return Vector2.zero;
 
             var playerPosition = (Vector2)PlayerObj.transform.position;
             var currentPosition = (Vector2)gameObject.transform.position;
-            Vector2 targetMoveDir;
+            Vector2 targetMoveDir = Vector2.zero;
 
-            // 2. Determine Direction
-            if (EnemyData.movement.movementType != null)
+            // 2. Determine Direction - Check if movement SO exists
+            if (EnemyData.movement != null && EnemyData.movement.movementType != null)
             {
                 targetMoveDir = EnemyData.movement.movementType(playerPosition, currentPosition, ref directionMask, updateMask);
             }
             else
             {
+                // Fallback: Just move toward the player
                 targetMoveDir = (playerPosition - currentPosition).normalized;
-                Debug.LogWarning($"[AI] Movement delegate was null on {EnemyData.movement.name}. Using fallback follow logic.");
+                // Debug.Log($"[AI] No MovementSO on {EnemyData.name}, using direct follow.");
             }
 
             // 3. Determine Speed
-            float finalSpeed = 0f;
+            float finalSpeed = (EnemyData is TopdownEnemySO ed) ? ed.movementSpeed : EnemyData.status3;
 
-            if (EnemyData is TopdownEnemySO ed)
-            {
-                finalSpeed = ed.movementSpeed;
-            }
-            else 
-            {
-                // Use Status 3 because the converter maps it to movementSpeed
-                finalSpeed = EnemyData.status3;
-            }
-
-            // 4. Final Safety: If speed is still 0 (from the SO), provide a default 
-            // so we can actually see if the physics are working.
-            if (finalSpeed <= 0) 
-            {
-                finalSpeed = 3.0f; 
-                Debug.Log($"[AI] Speed was 0 on {EnemyData.name}, using safety speed of 3.0");
-            }
+            // 4. Final Safety: Use 3.0f if the data says 0
+            if (finalSpeed <= 0) finalSpeed = 3.0f;
 
             return targetMoveDir * finalSpeed;
         }
 
-        private void Wait()
-        {
-            _enemyRigidBody.linearVelocity = Vector3.zero;
-        }
-
         private void OnCollisionStay2D(Collision2D collision)
         {
-            if (!collision.gameObject.CompareTag("Player")) return;
-
             var collisionDirection = Vector3.Normalize(gameObject.transform.position - collision.gameObject.transform.position);
+            if (!collision.gameObject.CompareTag("Player")) return;
             OnPlayerHit();
-
-            int finalDamage = 0;
-
-            if (EnemyData != null)
-            {
-                // 1. Search for a FIELD named 'damage' (Scanning all base classes)
-                var field = EnemyData.GetType().GetField("damage", 
-                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | 
-                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.FlattenHierarchy);
-
-                if (field != null)
-                {
-                    finalDamage = Mathf.RoundToInt(System.Convert.ToSingle(field.GetValue(EnemyData)));
-                }
-                else 
-                {
-                    // 2. Search for a PROPERTY named 'damage' (in case it's {get; set;})
-                    var prop = EnemyData.GetType().GetProperty("damage", 
-                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | 
-                        System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.FlattenHierarchy);
-                    
-                    if (prop != null)
-                    {
-                        finalDamage = Mathf.RoundToInt(System.Convert.ToSingle(prop.GetValue(EnemyData)));
-                    }
-                }
-            }
-
-            if (finalDamage > 0)
-            {
-                Debug.Log($"[Arena-Success] Impact! Damage Applied: {finalDamage}");
-                collision.gameObject.GetComponent<HealthController>().ApplyDamage(finalDamage, collisionDirection, IndexOnEnemyList);
-            }
-            else
-            {
-                // This is the fallback for the Arena so your agent can still function
-                finalDamage = 1; 
-                Debug.LogWarning($"[Arena-Safety] Could not find 'damage' data. Applying safety damage of 1.");
-                collision.gameObject.GetComponent<HealthController>().ApplyDamage(finalDamage, collisionDirection, IndexOnEnemyList);
-            }
+            if (EnemyData is TopdownEnemySO ed)
+                collision.gameObject.GetComponent<HealthController>().ApplyDamage(ed.damage, collisionDirection, IndexOnEnemyList);
         }
 
         public void CheckDeath()
@@ -287,14 +256,22 @@ namespace Game.GameManager
 
         protected virtual void StartDeath()
         {
+            // Notify sound system
             ((ISoundEmitter)this).OnSoundEmitted(this, new EmitSfxEventArgs(AudioManager.SfxTracks.EnemyDeath));
-            StopCoroutine(_walkRoutine);
+            
+            if (_walkRoutine != null) StopCoroutine(_walkRoutine);
             _animator.SetTrigger(DieTrigger);
+            
+            // Physics Shutdown
             _enemyCollider.enabled = false;
-            _enemyRigidBody.linearVelocity = Vector2.zero;
-            foreach (var childCollider in _childrenCollider)
+            if (_enemyRigidBody != null) _enemyRigidBody.linearVelocity = Vector2.zero;
+            foreach (var childCollider in _childrenCollider) childCollider.enabled = false;
+
+            // --- AUTOMATIC ARENA REGISTRATION ---
+            if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode)
             {
-                childCollider.enabled = false;
+                // registers +1 kill in the arenamanager
+                UnityEngine.Object.FindAnyObjectByType<ArenaManager>()?.RegisterKill();
             }
         }
 
@@ -317,25 +294,32 @@ namespace Game.GameManager
 
         public virtual void LoadEnemyData(EnemySO enemyData, int questId)
         {
-            if (!_hasGotComponents)
-            {
-                GetAllComponents();
-            }
-            
+            _isAIActive = false; // Reset this so FixedUpdate/CheckReadiness can trigger StartAI again
+            if (_walkRoutine != null) StopCoroutine(_walkRoutine);
+            // Ensure we have the player reference if GetAllComponents failed earlier
+            if (PlayerObj == null && Player.DungeonPlayer.Instance != null)
+            PlayerObj = Player.DungeonPlayer.Instance.gameObject;
             EnemyData = enemyData;
-            
-            if (EnemyData is TopdownEnemySO ed)
-                _healthController.SetHealth(ed.health);
-                
             QuestId = questId;
-
-            // KICKSTART MOVEMENT: Now that we have data, we can safely start walking
-            if (EnemyData != null && EnemyData.movement != null)
+            
+            // Ensure HealthController is synced with the new data
+            if (_healthController != null) 
             {
-                if (_walkRoutine != null) StopCoroutine(_walkRoutine); 
-                _isRandomMovement = IsRandomMovement();
-                _walkRoutine = StartCoroutine(WalkAndWait());
-                Debug.Log($"[AI] {gameObject.name} data received. Starting movement.");
+                int resolvedHealth = (EnemyData is TopdownEnemySO ed) ? ed.health : (int)EnemyData.status1;
+                _healthController.SetHealth(resolvedHealth);
+            }
+        }
+
+        // Child classes (like Skeleton) will override this to color their swords/armor
+
+        // ~ enemy visuals ~ //
+
+        protected virtual void InitializeEnemyVisuals()
+        {
+            if (enemyColorPalette != null)
+            {
+                OriginalColor = enemyColorPalette.MainColorD;
+                if (TryGetComponent<SpriteRenderer>(out var sr)) sr.color = OriginalColor;
             }
         }
 
@@ -356,6 +340,19 @@ namespace Game.GameManager
                     return enemyColorPalette.OutfitColorD;
                 default:
                     throw new InvalidEnumArgumentException("Movement Enum does not exist");
+            }
+        }
+
+                protected Color OriginalColor
+        {
+            get => _originalColor;
+            set
+            {
+                _originalColor = value;
+                if (_healthController != null)
+                {
+                    _healthController.SetOriginalColor(_originalColor);
+                }
             }
         }
 
