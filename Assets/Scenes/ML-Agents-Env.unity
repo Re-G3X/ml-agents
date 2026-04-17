@@ -2514,12 +2514,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18859ab3f7ce0334c887be87cd6a16b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Project.Game::ArenaManager
-  theSkeleton: {fileID: 513601572}
-  trainingEnemyData: {fileID: 11400000, guid: 2a216a9425d8bef40882b405ac796d88, type: 2}
-  playerHealth: {fileID: 2057696069}
+  trainingEnemies:
+  - {fileID: 513601572}
+  trainingEnemyData:
+  - {fileID: 11400000, guid: 094ed29a468e07445b316adf4f6e2290, type: 2}
   playerSpawnPos: {x: 10.68, y: 2.65}
   enemySpawnPos: {x: 6.17, y: 3.5}
-  totalEnemiesInWave: 1
 --- !u!4 &1558472675
 Transform:
   m_ObjectHideFlags: 0
@@ -3065,18 +3065,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 2057696067}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2057696069 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2376619585032857282, guid: 8fea4dd3f18348d42a4a32bb977123cd,
-    type: 3}
-  m_PrefabInstance: {fileID: 2057696067}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2057696068}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 78b6a48cb1ec2a14fb16f518b7315b8d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

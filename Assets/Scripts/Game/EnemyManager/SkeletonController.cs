@@ -42,47 +42,24 @@ namespace Game.EnemyManager
 
         public override void LoadEnemyData(EnemySO enemyData, int questId)
         {
-            // 1. Assign the data reference
-            this.EnemyData = enemyData; 
+            // 1. Run base class logic FIRST to ensure AI Reboot happens
+            base.LoadEnemyData(enemyData, questId);
 
             // 2. Resolve the Health Value
-            int initialHealth = 1; // Fallback safety
+            int initialHealth = (enemyData is TopdownEnemySO topdownData) ? topdownData.health : (int)enemyData.status1;
 
-            if (enemyData is TopdownEnemySO topdownData)
-            {
-                // If it's already a TopdownSO, use the explicit health field
-                initialHealth = topdownData.health;
-            }
-            else
-            {
-                // Otherwise, use the status1 mapping confirmed by your conversion script
-                initialHealth = (int)enemyData.status1;
-            }
-
-            // 3. Force the HealthController to capture this as MAX and CURRENT
             if (TryGetComponent(out HealthController h))
             {
                 h.SetHealth(initialHealth);
-                
-                if (enemyColorPalette != null) 
-                    h.SetOriginalColor(enemyColorPalette.MainColorD);
+                if (enemyColorPalette != null) h.SetOriginalColor(enemyColorPalette.MainColorD);
             }
 
-            // 4. Run base class logic
-            base.LoadEnemyData(enemyData, questId);
-
-            // 5. Equipment Logic (unchanged)
-            if (EnemyData != null && EnemyData.weapon != null)
+            // 3. Equipment Logic with strict Null Checks
+            if (enemyData != null && enemyData.weapon != null)
             {
-                switch (EnemyData.weapon.name)
-                {
-                    case "Sword":
-                        if (Sword != null) Sword.SetActive(true);
-                        break;
-                    case "Shield":
-                        if (Shield != null) Shield.SetActive(true);
-                        break;
-                }
+                string weaponName = enemyData.weapon.name;
+                if (weaponName == "Sword" && Sword != null) Sword.SetActive(true);
+                if (weaponName == "Shield" && Shield != null) Shield.SetActive(true);
             }
         }
 
