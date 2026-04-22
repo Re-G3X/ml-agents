@@ -48,6 +48,8 @@ EditorBuildSettings:
     path: Assets/Scenes/ExperimentLevelSelector.unity
     guid: 98e262a735cfb66468973ba893ee3ac8
   m_configObjects:
+    com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f,
+      type: 2}
     com.unity.input.settings: {fileID: 11400000, guid: 5485ac31a41ef9b46bd1b977b05b8368,
       type: 2}
   m_UseUCBPForAssetBundles: 0

@@ -1,6 +1,7 @@
 ﻿using Game.Events;
 using Game.Quests;
 using UnityEngine;
+using System;
 
 namespace Game.GameManager
 {
@@ -14,7 +15,7 @@ namespace Game.GameManager
         private Color _originalColor;
         private SpriteRenderer _spriteRenderer;
         private EnemyController _enemyController;
-
+        public event Action<float> OnDamageTaken; // Passes the damage amount to Brain/ML-Agents
         public static event PlayerIsDamagedEvent PlayerIsDamagedEventHandler;
 
         private void Start()
@@ -60,6 +61,8 @@ namespace Game.GameManager
             health -= damage;
             _isInvincible = true;
             _invincibilityCount = 0f;
+
+            OnDamageTaken?.Invoke((float)damage); // NEW: Notify the Agent instantly
 
             if (gameObject.CompareTag("Player"))
             {

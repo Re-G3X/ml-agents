@@ -14,10 +14,13 @@ public class ArenaManager : MonoBehaviour
     [Header("Spawn Settings")]
     public Vector2 playerSpawnPos = new Vector2(10.68f, 2.65f);
     public Vector2 enemySpawnPos = new Vector2(6.17f, 3.50f);
-
+    
     private PlayerController _playerController;
     private HealthController _playerHealth;
     private int _remainingEnemies = 0;
+    
+    // FIX 1: Use the new class name to avoid conflict with Dialogue Agent
+    private PlayerMLAgent _playerAgent; 
 
     void OnEnable()
     {
@@ -34,11 +37,17 @@ public class ArenaManager : MonoBehaviour
         if (GameManagerSingleton.Instance != null)
             GameManagerSingleton.Instance.arenaMode = true;
 
+        // 1. Find the player object FIRST
         var playerObj = GameObject.FindGameObjectWithTag("Player");
+        
         if (playerObj != null)
         {
+            // 2. NOW grab the components from it
             _playerController = playerObj.GetComponent<PlayerController>();
             _playerHealth = playerObj.GetComponent<HealthController>();
+            
+            // FIX 2: Grabbing the updated ML component name
+            _playerAgent = playerObj.GetComponent<PlayerMLAgent>();
         }
 
         CleanupMainGameSystems();
@@ -59,31 +68,20 @@ public class ArenaManager : MonoBehaviour
 
     void InitializeArena()
     {
-        Debug.Log($"[Arena] Checking Lists -> Enemies: {trainingEnemies.Count} | Data: {trainingEnemyData.Count}");
-
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player"); 
 
         for (int i = 0; i < trainingEnemies.Count; i++)
         {
             var enemy = trainingEnemies[i];
-            if (enemy == null) {
-                Debug.LogError($"[Arena] Enemy at index {i} is NULL!");
-                continue;
-            }
+            if (enemy == null) continue;
 
             if (playerObj != null) enemy.target = playerObj.transform;
 
             if (i < trainingEnemyData.Count)
             {
-                Debug.Log($"[Arena] Calling LoadEnemyData for {enemy.gameObject.name} with {trainingEnemyData[i].name}");
                 enemy.LoadEnemyData(trainingEnemyData[i], 1);
-                // FORCE ENABLE: If the script was stuck, this toggle triggers OnEnable/Start logic again
                 enemy.enabled = false;
                 enemy.enabled = true;
-            }
-            else
-            {
-                Debug.LogError($"[Arena] No Data found for enemy at index {i}! trainingEnemyData list is too small.");
             }
 
             _remainingEnemies++;
@@ -94,8 +92,14 @@ public class ArenaManager : MonoBehaviour
     public void RegisterKill()
     {
         _remainingEnemies--;
+        
+        // Give a positive reward for a kill
+        _playerAgent?.AddReward(1.0f); 
+        
         if (_remainingEnemies <= 0)
         {
+            // FIX 3: EndEpisode() is the correct MLAgents command
+            _playerAgent?.EndEpisode(); 
             ResetTrainingCycle();
         }
     }
@@ -162,6 +166,12 @@ public class ArenaManager : MonoBehaviour
 
     private void OnPlayerDamaged(object sender, PlayerIsDamagedEventArgs e)
     {
-        if (e.PlayerHealth <= 0) ResetTrainingCycle();
+        if (e.PlayerHealth <= 0)
+        {
+            // Give a negative reward for dying before resetting
+            _playerAgent?.AddReward(-1.0f);
+            _playerAgent?.EndEpisode();
+            ResetTrainingCycle();
+        }
     }
 }
