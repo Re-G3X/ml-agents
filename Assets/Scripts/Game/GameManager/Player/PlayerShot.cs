@@ -1,6 +1,7 @@
 ﻿using ScriptableObjects;
 using System;
 using System.Collections;
+using System.Reflection; // Added for reflection
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,21 +9,24 @@ namespace Game.GameManager.Player
 {
     public class PlayerShot : PlayerInputHandler
     {
-
         private struct BulletForceAndRotation
         {
             public Vector2 Force;
             public int Rotation;
         }
-        [SerializeField]
-        protected float shootSpeed, atkSpeed;
+
+        [SerializeField] protected float shootSpeed, atkSpeed;
         private bool _canShoot;
         private bool _isHoldingShoot;
+        private Vector2 _currentShotDir;
+
         [SerializeField] private GameObject bulletSpawn;
         [SerializeField] private GameObject bulletPrefab;
         [field: SerializeField] public ProjectileTypeSO ProjectileType { get; set; }
         [SerializeField] private ProjectileTypeRuntimeSetSO projectilesAvailable;
-        private Rigidbody2D _rigidbody2D;
+        
+        private Component _physicsBody; 
+        
         private static readonly int LastDirX = Animator.StringToHash("LastDirX");
         private static readonly int LastDirY = Animator.StringToHash("LastDirY");
         private static readonly int IsShooting = Animator.StringToHash("IsShooting");
@@ -39,92 +43,89 @@ namespace Game.GameManager.Player
         {
             base.Start();
             SetProjectileSo();
-            _rigidbody2D = gameObject.GetComponent<Rigidbody2D>();
+            _physicsBody = GetComponent("Rigidbody2D");
         }
 
-        public void Shoot(InputAction.CallbackContext context)
+        // --- ML-AGENTS COMPATIBLE FUNCTION ---
+        public void ApplyShoot(bool isFiring, Vector2 direction)
         {
-            if (context.performed)
+            if (direction.sqrMagnitude > _minShootMagnitude)
+            {
+                _currentShotDir = direction.normalized;
+            }
+
+            if (isFiring && !_isHoldingShoot)
             {
                 _isHoldingShoot = true;
                 PlayerAnimator.SetBool(IsShooting, true);
+                StopCoroutine(nameof(ShootBulletLoop));
+                StartCoroutine(nameof(ShootBulletLoop));
             }
-            else if (context.canceled)
+            else if (!isFiring && _isHoldingShoot)
             {
                 _isHoldingShoot = false;
                 PlayerAnimator.SetBool(IsShooting, false);
             }
-            var inputX = context.ReadValue<Vector2>().x;
-            var inputY = context.ReadValue<Vector2>().y;
-            var shotDirection = new Vector2(inputX, inputY);
-            shotDirection.Normalize();
-            if (shotDirection.magnitude > _minShootMagnitude)
-                StartCoroutine(ShootBullet(shotDirection));
         }
 
-        private IEnumerator ShootBullet(Vector2 shotDirection)
+        // --- PLAYER INPUT SYSTEM ---
+        public void Shoot(InputAction.CallbackContext context)
+        {
+            Vector2 inputVal = context.ReadValue<Vector2>();
+            
+            if (context.performed)
+                ApplyShoot(true, inputVal);
+            else if (context.canceled)
+                ApplyShoot(false, inputVal);
+        }
+
+        private IEnumerator ShootBulletLoop()
         {
             while (_isHoldingShoot)
             {
-                yield return null;
-                if (!_canShoot) continue;
-                var bulletForceAndRotation = GetBulletForceAndRotation(shotDirection);
-                UpdateShotAnimation(shotDirection);
-                RotateSpawnPoint(bulletForceAndRotation);
-                SpawnAndShootBullet(bulletForceAndRotation);
-                var coolDownTime = GetCooldown();
-                StartCoroutine(CountCooldown(coolDownTime));
+                if (!_canShoot)
+                {
+                    yield return null;
+                    continue;
+                }
+
+                var bfr = GetBulletForceAndRotation(_currentShotDir);
+                UpdateShotAnimation(_currentShotDir);
+                
+                bulletSpawn.transform.rotation = Quaternion.Euler(0, 0, bfr.Rotation);
+
+                var bullet = Instantiate(bulletPrefab, bulletSpawn.transform.position, bulletSpawn.transform.rotation);
+                var bulletController = bullet.GetComponent<ProjectileController>();
+                bulletController.ProjectileSo = ProjectileType;
+
+                Vector2 currentVel = Vector2.zero;
+                if (_physicsBody != null)
+                {
+                    // Stealth access to 'velocity' or 'linearVelocity' via reflection
+                    PropertyInfo prop = _physicsBody.GetType().GetProperty("linearVelocity") ?? _physicsBody.GetType().GetProperty("velocity");
+                    if (prop != null) currentVel = (Vector2)prop.GetValue(_physicsBody, null);
+                }
+
+                bulletController.Shoot(bfr.Force + currentVel.normalized);
+                
+                yield return StartCoroutine(CountCooldown(1.0f / atkSpeed));
             }
-        }
-
-        private float GetCooldown()
-        {
-            return 1.0f / atkSpeed;
-        }
-
-        private void SpawnAndShootBullet(BulletForceAndRotation bulletForceAndRotation)
-        {
-            var bullet = Instantiate(bulletPrefab, bulletSpawn.transform.position, bulletSpawn.transform.rotation);
-            var bulletController = bullet.GetComponent<ProjectileController>();
-            bulletController.ProjectileSo = ProjectileType;
-            bulletController.Shoot(bulletForceAndRotation.Force + _rigidbody2D.linearVelocity.normalized);
-        }
-
-        private void RotateSpawnPoint(BulletForceAndRotation bulletForceAndRotation)
-        {
-            bulletSpawn.transform.rotation = Quaternion.Euler(0, 0, bulletForceAndRotation.Rotation);
         }
 
         private BulletForceAndRotation GetBulletForceAndRotation(Vector2 shotDirection)
         {
-            BulletForceAndRotation bulletForceAndRotation;
-            if (shotDirection.x > _maxShootDir)
+            BulletForceAndRotation bfr;
+            if (Mathf.Abs(shotDirection.x) > Mathf.Abs(shotDirection.y))
             {
-                bulletForceAndRotation.Rotation = 0;
-                bulletForceAndRotation.Force = new Vector2(shootSpeed, 0f);
-            }
-            else if (shotDirection.x < -_maxShootDir)
-            {
-                bulletForceAndRotation.Rotation = 180;
-                bulletForceAndRotation.Force = new Vector2(-shootSpeed, 0f);
-            }
-            else if (shotDirection.y > _maxShootDir)
-            {
-                bulletForceAndRotation.Rotation = 90;
-                bulletForceAndRotation.Force = new Vector2(0f, shootSpeed);
+                bfr.Rotation = shotDirection.x > 0 ? 0 : 180;
+                bfr.Force = new Vector2(shotDirection.x > 0 ? shootSpeed : -shootSpeed, 0f);
             }
             else
             {
-                bulletForceAndRotation.Rotation = 270;
-                bulletForceAndRotation.Force = new Vector2(0f, -shootSpeed);
+                bfr.Rotation = shotDirection.y > 0 ? 90 : 270;
+                bfr.Force = new Vector2(0f, shotDirection.y > 0 ? shootSpeed : -shootSpeed);
             }
-
-            return bulletForceAndRotation;
-        }
-
-        public void ChangeWeapon(InputAction.CallbackContext context)
-        {
-            NextProjectileSo();
+            return bfr;
         }
 
         private IEnumerator CountCooldown(float bulletCooldown)
@@ -140,6 +141,8 @@ namespace Game.GameManager.Player
             PlayerAnimator.SetFloat(LastDirY, shotDirection.y);
         }
 
+        // --- REQUIRED OVERRIDES FROM PlayerInputHandler ---
+
         protected override void StartInput(object sender, EventArgs eventArgs)
         {
             _canShoot = true;
@@ -148,17 +151,19 @@ namespace Game.GameManager.Player
         protected override void StopInput(object sender, EventArgs eventArgs)
         {
             _canShoot = false;
+            _isHoldingShoot = false;
+            if (PlayerAnimator != null) PlayerAnimator.SetBool(IsShooting, false);
         }
+
+        // --- RE-IMPLEMENTED UTILITIES ---
 
         private void SetProjectileSo()
         {
             bulletPrefab = ProjectileType.projectilePrefab;
-            bulletPrefab.GetComponent<ProjectileController>().ProjectileSo = ProjectileType;
             atkSpeed = ProjectileType.atkSpeed;
-            bulletPrefab.GetComponent<SpriteRenderer>().color = ProjectileType.color;
         }
 
-        private void NextProjectileSo()
+        public void ChangeWeapon(InputAction.CallbackContext context)
         {
             var currentIndex = projectilesAvailable.Items.IndexOf(ProjectileType);
             var nextIndex = (currentIndex + 1) % projectilesAvailable.Items.Count;
