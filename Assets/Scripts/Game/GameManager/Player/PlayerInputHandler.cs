@@ -22,7 +22,7 @@ namespace Game.GameManager.Player
 
         private void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
         {
-            if (scene.name is "Overworld" or "LevelWithEnemies")
+            if (scene.name is "Overworld" or "LevelWithEnemies" or "ML-Agents-Env")
             {
                 StartInput(null, EventArgs.Empty);
             }

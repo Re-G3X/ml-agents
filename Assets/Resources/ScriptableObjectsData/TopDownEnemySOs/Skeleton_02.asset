@@ -27,6 +27,6 @@ MonoBehaviour:
   damage: 2
   movementSpeed: 2
   activeTime: 5
-  restTime: 1
+  restTime: 0
   attackSpeed: 3
   projectileSpeed: 3

@@ -19,18 +19,42 @@ namespace Game.GameManager.Player
         private static readonly int DirY = Animator.StringToHash("DirY");
         private static readonly int IsShooting = Animator.StringToHash("IsShooting");
 
-        public void Move(InputAction.CallbackContext context)
+        // --- NEW INPUT HANDLER ---
+        public void OnMoveInput(InputAction.CallbackContext context)
         {
+            Debug.Log($"[Movement Check] Input Received! Can move: {_canMove}");
+            if (!_canMove) return;
             if (context.canceled)
             {
-                _lastSpeed = Vector2.zero;
+                ApplyMovement(Vector2.zero);
                 return;
             }
-            if (!_canMove) return;
-            if (!context.performed) return;
-            var movement = context.ReadValue<Vector2>();
+
+            if (context.performed)
+            {
+                var input = context.ReadValue<Vector2>();
+                ApplyMovement(input);
+            }
+        }
+
+        // --- THE MOTOR (This is what ML-Agents will call) ---
+        public void ApplyMovement(Vector2 movement)
+        {
+            if (!_canMove) 
+            {
+                Debug.LogWarning("APPLY MOVEMENT CALLED BUT _CANMOVE IS FALSE!");
+                return;
+            }
+            // If the magnitude is very small, treat it as zero to avoid "drifting"
+            if (movement.sqrMagnitude < 0.01f)
+            {
+                _lastSpeed = Vector2.zero;
+                UpdateMoveAnimation(Vector2.zero);
+                return;
+            }
+
             movement.Normalize();
-            _lastSpeed = new Vector2(movement.x * speed, movement.y * speed);
+            _lastSpeed = movement * speed;
             UpdateMoveAnimation(movement);
         }
 
@@ -42,6 +66,7 @@ namespace Game.GameManager.Player
         private void Awake()
         {
             _canMove = true;
+            Debug.Log($"[Movement Check] Awake fired. _canMove is {_canMove}");
         }
 
         protected override void Start()
