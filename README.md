@@ -3,7 +3,7 @@ Ongoing integration of ML-Agents for RL testing/development within the Overlord 
 ## Tech Stack
 - **Unity Version:** 6000.3.11f1
 - **Python Version:** 3.10.11
-- **PyTorch Version:** 2.8 (#6251)
+- **PyTorch Version:** 2.8.0
 - **ML-Agents Unity Package Version:** 4.0.3
 - **ML-Agents Python Package Version:** 1.1.0
 
