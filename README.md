@@ -4,7 +4,8 @@ Ongoing integration of ML-Agents for RL testing/development within the Overlord 
 - **Unity Version:** 6000.3.11f1
 - **Python Version:** 3.10.11
 - **PyTorch Version:** 2.8 (#6251)
-- **ML-Agents Version:** 4.0.3
+- **ML-Agents Unity Package Version:** 4.0.3
+- **ML-Agents Python Package Version:** 1.1.0
   
 ## Dependency Chain
 The following packages are already within the Unity project, but they are the main packages necessary for Overlord to work seamlessly.
