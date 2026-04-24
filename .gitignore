@@ -109,3 +109,9 @@ C4_Context.puml
 System.plant
 .idea/
 Assets/StreamingAssets/PlayerData/
+
+# Ignore all ml-agents results by default
+Config/results/
+
+# Ignore ml-agents timer files (performance telemetry)
+/[Aa]ssets/ML-Agents/Timers/
