@@ -8,6 +8,19 @@ using Game.GameManager;
 // We rename this to PlayerMLAgent to avoid conflict with Fog.Dialogue.Agent
 public class PlayerMLAgent : Unity.MLAgents.Agent 
 {
+    [Header("Reward Shaping (Experimental Variables)")]
+    [Tooltip("Penalty applied every frame to encourage speed.")]
+    [SerializeField] private float existencePenalty = -0.0005f;
+
+    [Tooltip("Penalty applied when taking damage.")]
+    [SerializeField] private float damagePenalty = -0.1f;
+
+    [Tooltip("Reward applied when hitting an enemy. (Call RegisterHit() from projectile)")]
+    [SerializeField] private float hitReward = 0.5f;
+
+    [Tooltip("Tiny reward for staying close to the enemy to prevent cowardice.")]
+    [SerializeField] private float proximityBonus = 0.001f;
+
     private PlayerMovement _movement;
     private PlayerShot _shot;
     private HealthController _health;
@@ -28,7 +41,16 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
 
     private void ScoldAgent(float damage)
     {
-        AddReward(-0.1f);
+        // Now uses the inspector variable
+        AddReward(damagePenalty);
+    }
+
+    /// <summary>
+    /// Call this from your Projectile/Combat script when this agent deals damage.
+    /// </summary>
+    public void RegisterHit()
+    {
+        AddReward(hitReward);
     }
 
     public override void OnEpisodeBegin()
@@ -38,14 +60,9 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        // If essential components are missing, we MUST still add 6 observations 
-        // to prevent the "Observation Size Mismatch" crash.
         if (_health == null || _arena == null) 
         {
-            for (int i = 0; i < 6; i++)
-            {
-                sensor.AddObservation(0f);
-            }
+            for (int i = 0; i < 6; i++) { sensor.AddObservation(0f); }
             return;
         }
 
@@ -66,18 +83,19 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
         }
         else
         {
-            // Must add exactly 3 floats to keep the total at 6
-            sensor.AddObservation(Vector2.zero); // Adds 2 floats (0,0)
-            sensor.AddObservation(0f);           // Adds 1 float
+            sensor.AddObservation(Vector2.zero);
+            sensor.AddObservation(0f);
         }
     }
 
     public override void OnActionReceived(ActionBuffers actions)
     {
+        // Movement
         float moveX = actions.ContinuousActions[0];
         float moveY = actions.ContinuousActions[1];
         _movement.ApplyMovement(new Vector2(moveX, moveY));
 
+        // Shooting
         int shootAction = actions.DiscreteActions[0];
         if (shootAction > 0)
         {
@@ -92,7 +110,20 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
             _shot.ApplyShoot(true, shootDir);
         }
 
-        AddReward(-0.0005f);
+        // --- Reward Logic ---
+
+        // 1. Existence Penalty
+        AddReward(existencePenalty);
+
+        // 2. Proximity Bonus (To fight cowardice)
+        if (_arena != null && _arena.trainingEnemies.Count > 0 && _arena.trainingEnemies[0] != null)
+        {
+            float dist = Vector2.Distance(transform.position, _arena.trainingEnemies[0].transform.position);
+            if (dist < 5f) 
+            {
+                AddReward(proximityBonus);
+            }
+        }
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
@@ -102,7 +133,6 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
         continuousActions[1] = Input.GetAxisRaw("Vertical");
 
         var discreteActions = actionsOut.DiscreteActions;
-        // Basic check for shooting in heuristic
         if (Input.GetKey(KeyCode.UpArrow)) discreteActions[0] = 1;
         else if (Input.GetKey(KeyCode.DownArrow)) discreteActions[0] = 2;
         else if (Input.GetKey(KeyCode.LeftArrow)) discreteActions[0] = 3;
