@@ -20,6 +20,27 @@ conda env create -f environment.yaml
 conda activate arena_training
 ```
 
+## Agent Configuration & Specs
+This project uses a custom observation space optimized for 2D arena combat.
+
+Behavior Name: PlayerMLAgent
+
+Vector Observation Space: 6 (Health ratio, Vector2 Position, Vector2 Enemy Direction, Distance to Enemy)
+
+Action Space:
+
+- Continuous (2): Movement (Horizontal, Vertical)
+- Discrete (1): Shooting (0: Idle, 1: Up, 2: Down, 3: Left, 4: Right)
+
+## Training & Monitoring
+To maintain reproducibility, always run training from the project root using the provided configuration:
+
+### Start Training:
+```mlagents-learn Config/arena_config.yaml --run-id=Overlord_Alpha_01 --force```
+
+### Monitor with TensorBoard:
+```tensorboard --logdir Config/results```
+
 ## Overlord's Dependency Chain
 The following packages are already within the Unity project, but they are the main packages necessary for Overlord to work seamlessly.
 
