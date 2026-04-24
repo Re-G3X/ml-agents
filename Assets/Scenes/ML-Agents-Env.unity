@@ -3112,6 +3112,10 @@ MonoBehaviour:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
   MaxStep: 100
+  existencePenalty: -0.0005
+  damagePenalty: -0.1
+  hitReward: 0.7
+  proximityBonus: 0.01
 --- !u!114 &2057696085
 MonoBehaviour:
   m_ObjectHideFlags: 0
