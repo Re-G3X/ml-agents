@@ -2052,6 +2052,103 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 1255286053}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1310447478
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5530646823187894244, guid: c38703354f5826241940d76bf6d7e6e4,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5530646823187894244, guid: c38703354f5826241940d76bf6d7e6e4,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5530646823187894244, guid: c38703354f5826241940d76bf6d7e6e4,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5530646823187894244, guid: c38703354f5826241940d76bf6d7e6e4,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 11.29
+      objectReference: {fileID: 0}
+    - target: {fileID: 5530646823187894244, guid: c38703354f5826241940d76bf6d7e6e4,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5530646823187894244, guid: c38703354f5826241940d76bf6d7e6e4,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.39379555
+      objectReference: {fileID: 0}
+    - target: {fileID: 5530646823187894244, guid: c38703354f5826241940d76bf6d7e6e4,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5530646823187894244, guid: c38703354f5826241940d76bf6d7e6e4,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5530646823187894244, guid: c38703354f5826241940d76bf6d7e6e4,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5530646823187894244, guid: c38703354f5826241940d76bf6d7e6e4,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5530646823187894244, guid: c38703354f5826241940d76bf6d7e6e4,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5530646823187894244, guid: c38703354f5826241940d76bf6d7e6e4,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5530646823187894244, guid: c38703354f5826241940d76bf6d7e6e4,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5530646823187894246, guid: c38703354f5826241940d76bf6d7e6e4,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -228357258890464381, guid: 29269b331c7bd2e4ca9b20f2eb3d526d,
+        type: 3}
+    - target: {fileID: 5530646823187894248, guid: c38703354f5826241940d76bf6d7e6e4,
+        type: 3}
+      propertyPath: m_Name
+      value: Treasure
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5530646823187894248, guid: c38703354f5826241940d76bf6d7e6e4,
+        type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 1533094264}
+    - targetCorrespondingSourceObject: {fileID: 5530646823187894248, guid: c38703354f5826241940d76bf6d7e6e4,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1533094263}
+  m_SourcePrefab: {fileID: 100100000, guid: c38703354f5826241940d76bf6d7e6e4, type: 3}
 --- !u!1 &1381459458
 GameObject:
   m_ObjectHideFlags: 0
@@ -2326,6 +2423,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1444398075}
   m_CullTransparentMesh: 0
+--- !u!1 &1533094259 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5530646823187894248, guid: c38703354f5826241940d76bf6d7e6e4,
+    type: 3}
+  m_PrefabInstance: {fileID: 1310447478}
+  m_PrefabAsset: {fileID: 0}
+--- !u!50 &1533094263
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1533094259}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!114 &1533094264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1533094259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 256f601199b048f4d8a2825ba13aae21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Game::Treasure
+  collectSound: {fileID: 8300000, guid: b0fecfaa9d9cd26448eca762aa7710bd, type: 3}
 --- !u!1 &1534882081
 GameObject:
   m_ObjectHideFlags: 0
@@ -2496,6 +2639,8 @@ MonoBehaviour:
   - {fileID: 513601572}
   trainingEnemyData:
   - {fileID: 11400000, guid: 094ed29a468e07445b316adf4f6e2290, type: 2}
+  treasures:
+  - {fileID: 1533094259}
   playerSpawnPos: {x: 10.68, y: 2.65}
   enemySpawnPos: {x: 6.17, y: 3.5}
 --- !u!4 &1558472675
@@ -3116,6 +3261,7 @@ MonoBehaviour:
   damagePenalty: -0.1
   hitReward: 0.7
   proximityBonus: 0.01
+  treasureReward: 1
 --- !u!114 &2057696085
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3145,3 +3291,4 @@ SceneRoots:
   - {fileID: 513601571}
   - {fileID: 381114962}
   - {fileID: 1202135049}
+  - {fileID: 1310447478}

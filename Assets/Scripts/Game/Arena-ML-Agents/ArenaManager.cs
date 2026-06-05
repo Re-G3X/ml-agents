@@ -10,10 +10,15 @@ public class ArenaManager : MonoBehaviour
     [Header("Training Entities")]
     public List<EnemyController> trainingEnemies = new List<EnemyController>();
     public List<TopdownEnemySO> trainingEnemyData = new List<TopdownEnemySO>(); 
-
+    
+    [Header("Treasure Settings")]
+    public List<GameObject> treasures = new List<GameObject>();
+    
     [Header("Spawn Settings")]
     public Vector2 playerSpawnPos = new Vector2(10.68f, 2.65f);
     public Vector2 enemySpawnPos = new Vector2(6.17f, 3.50f);
+    
+
     
     private PlayerController _playerController;
     private HealthController _playerHealth;
@@ -135,6 +140,12 @@ public class ArenaManager : MonoBehaviour
             {
                 enemy.LoadEnemyData(trainingEnemyData[i], 1);
             }
+        }
+
+        foreach (var treasure in treasures)
+        {
+            if (treasure != null)
+                treasure.SetActive(true);
         }
 
         _remainingEnemies = trainingEnemies.Count;

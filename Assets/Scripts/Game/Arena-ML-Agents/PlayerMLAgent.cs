@@ -21,6 +21,10 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
     [Tooltip("Tiny reward for staying close to the enemy to prevent cowardice.")]
     [SerializeField] private float proximityBonus = 0.001f;
 
+    [Tooltip("Reward applied when collecting a treasure.")]
+    [SerializeField] private float treasureReward = 1f;
+
+
     private PlayerMovement _movement;
     private PlayerShot _shot;
     private HealthController _health;
@@ -45,9 +49,6 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
         AddReward(damagePenalty);
     }
 
-    /// <summary>
-    /// Call this from your Projectile/Combat script when this agent deals damage.
-    /// </summary>
     public void RegisterHit()
     {
         AddReward(hitReward);
@@ -110,12 +111,10 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
             _shot.ApplyShoot(true, shootDir);
         }
 
-        // --- Reward Logic ---
-
-        // 1. Existence Penalty
+        // Existence Penalty
         AddReward(existencePenalty);
 
-        // 2. Proximity Bonus (To fight cowardice)
+        // Proximity Bonus
         if (_arena != null && _arena.trainingEnemies.Count > 0 && _arena.trainingEnemies[0] != null)
         {
             float dist = Vector2.Distance(transform.position, _arena.trainingEnemies[0].transform.position);
@@ -138,5 +137,10 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
         else if (Input.GetKey(KeyCode.LeftArrow)) discreteActions[0] = 3;
         else if (Input.GetKey(KeyCode.RightArrow)) discreteActions[0] = 4;
         else discreteActions[0] = 0;
+    }
+
+    public void RegisterTreasureCollect()
+    {
+        AddReward(treasureReward);
     }
 }
