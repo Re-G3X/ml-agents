@@ -139,6 +139,8 @@ namespace Game.LevelManager.DungeonManager
 
         private void OnTriggerEnter2D(Collider2D other)
         {
+            //Debug.Log($"[DoorBhv] Triggered. arenaMode={GameManagerSingleton.Instance?.arenaMode}, Instance={GameManagerSingleton.Instance != null}");
+            
             // Verify if it's arena mode, so we ignore/skip the original door logic and 
             // just reward the agent for finishing 
             if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode)

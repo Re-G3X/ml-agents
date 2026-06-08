@@ -4,6 +4,7 @@ using Game.GameManager;
 using Game.Events;
 using Game.GameManager.Player;
 using ScriptableObjects;
+using Game.LevelManager.DungeonManager;
 
 public class ArenaManager : MonoBehaviour 
 {
@@ -12,7 +13,8 @@ public class ArenaManager : MonoBehaviour
     public bool endEpisodeOnExit = true;
     [Tooltip("If true, defeating all enemies ends the episode and resets the arena.")]
     public bool endEpisodeByEliminatingEnemies = true;
-
+    [Header("Room Reference")]
+    public RoomBhv roomBhv;
     [Header("Training Entities")]
     public List<EnemyController> trainingEnemies = new List<EnemyController>();
     public List<TopdownEnemySO> trainingEnemyData = new List<TopdownEnemySO>(); 
@@ -22,7 +24,6 @@ public class ArenaManager : MonoBehaviour
     
     [Header("Spawn Settings")]
     public Vector2 playerSpawnPos = new Vector2(10.68f, 2.65f);
-    public Vector2 enemySpawnPos = new Vector2(6.17f, 3.50f);
     
     private PlayerController _playerController;
     private HealthController _playerHealth;
@@ -61,6 +62,15 @@ public class ArenaManager : MonoBehaviour
 
         CleanupMainGameSystems();
         InitializeArena();
+
+        foreach (var treasure in treasures)
+        {
+            if (treasure != null && roomBhv != null && roomBhv.spawnPoints.Count > 0)
+            {
+                int idx = Random.Range(0, roomBhv.spawnPoints.Count);
+                treasure.transform.position = roomBhv.spawnPoints[idx];
+            }
+        }
     }
 
     private void CleanupMainGameSystems()
@@ -170,7 +180,15 @@ public class ArenaManager : MonoBehaviour
         foreach (var treasure in treasures)
         {
             if (treasure != null)
+            {
+                if (roomBhv != null && roomBhv.spawnPoints.Count > 0)
+                {
+                    int idx = Random.Range(0, roomBhv.spawnPoints.Count);
+                    Vector3 spawnPos = roomBhv.spawnPoints[idx];
+                    treasure.transform.position = spawnPos;
+                }
                 treasure.SetActive(true);
+            }
         }
 
         _remainingEnemies = trainingEnemies.Count;
@@ -179,21 +197,33 @@ public class ArenaManager : MonoBehaviour
 
     private void ForcePositions()
     {
+        // player spawn
         if (_playerController != null)
         {
             _playerController.transform.position = playerSpawnPos;
             if (_playerController.TryGetComponent(out Rigidbody2D rb)) rb.linearVelocity = Vector2.zero;
         }
-
+        
+        // enemy spawn
         foreach (var enemy in trainingEnemies)
         {
             if (enemy != null)
             {
-                enemy.transform.position = enemySpawnPos;
+                if (roomBhv != null && roomBhv.spawnPoints.Count > 0)
+                {
+                    int idx = Random.Range(0, roomBhv.spawnPoints.Count);
+                    enemy.transform.position = roomBhv.spawnPoints[idx];
+                }
+                else
+                {
+                    // No spawn points configured; leave the enemy where it is and log a warning.
+                    Debug.LogWarning("No spawn points available in RoomBhv. Enemy position unchanged.");
+                }
                 if (enemy.TryGetComponent(out Rigidbody2D erb)) erb.linearVelocity = Vector2.zero;
             }
         }
 
+        // camera spawn
         if (Camera.main != null)
         {
             Camera.main.transform.position = new Vector3(playerSpawnPos.x, playerSpawnPos.y, Camera.main.transform.position.z);
