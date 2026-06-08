@@ -289,7 +289,15 @@ namespace Game.GameManager
 
         public void Die()
         {
-            Destroy(gameObject);
+            if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode)
+            {
+                // Deactivate instead of destroying so the ArenaManager.cs can reactivate the enemy.
+                gameObject.SetActive(false);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
 
         public virtual void LoadEnemyData(EnemySO enemyData, int questId)

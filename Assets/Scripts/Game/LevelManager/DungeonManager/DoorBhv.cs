@@ -5,6 +5,7 @@ using Game.Events;
 using Game.GameManager.Player;
 using UnityEngine;
 using Util;
+using Game.GameManager;
 
 namespace Game.LevelManager.DungeonManager
 {
@@ -28,17 +29,26 @@ namespace Game.LevelManager.DungeonManager
         private SpriteRenderer _doorSprite;
         private static readonly int GradientColor1 = Shader.PropertyToID("gradientColor1");
         private static readonly int GradientColor2 = Shader.PropertyToID("gradientColor2");
-
+        private ArenaManager _arenaManager; //cache
         public static event ExitRoomEvent ExitRoomEventHandler;
         public static event KeyUsedEvent KeyUsedEventHandler;
 
         private void Awake()
         {
             isOpen = false;
-            _currentRoom = transform.parent.GetComponent<RoomBhv>();
-            _doorSprite = GetComponent<SpriteRenderer>();
-        }
 
+            // _currentRoom may be null if the door isn't parented under a RoomBhv (common in arena)
+            if (transform.parent != null)
+                _currentRoom = transform.parent.GetComponent<RoomBhv>();
+
+            _doorSprite = GetComponent<SpriteRenderer>();
+
+            // Find the ArenaManager anywhere in the scene (safe even if null)
+            _arenaManager = Object.FindFirstObjectByType<ArenaManager>();
+            if (_arenaManager == null)
+                Debug.LogWarning($"[{gameObject.name}] No ArenaManager found in the scene. Door will not trigger reset.");
+        }
+        
         private bool DestroyIfDoesNotExist()
         {
 	        if (keyID != null) return false;
@@ -129,8 +139,16 @@ namespace Game.LevelManager.DungeonManager
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (!other.CompareTag("PlayerTrigger")) return;
+            // Verify if it's arena mode, so we ignore/skip the original door logic and 
+            // just reward the agent for finishing 
+            if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode)
+            {
+                if (_arenaManager != null)
+                    _arenaManager.RegisterExitReached();
+                return;
+            }
             
+            if (!other.CompareTag("PlayerTrigger")) return;
             
             var commonKeys = keyID.Intersect(DungeonPlayer.Instance.Keys).ToList();
             if (keyID.Count == 0 || isOpen)

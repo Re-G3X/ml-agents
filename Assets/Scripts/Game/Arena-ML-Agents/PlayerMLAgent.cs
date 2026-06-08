@@ -12,13 +12,25 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
     [Tooltip("Penalty applied every frame to encourage speed.")]
     [SerializeField] private float existencePenalty = -0.0005f;
 
-    [Tooltip("Penalty applied when taking damage.")]
+    [Tooltip("Penalty applied when the agent dies.")]
+    [SerializeField] private float deathPenalty = -1.0f;
+
+    [Tooltip("Penalty applied when the agent takes damage.")]
     [SerializeField] private float damagePenalty = -0.1f;
 
-    [Tooltip("Reward applied when hitting an enemy. (Call RegisterHit() from projectile)")]
+    [Tooltip("Reward applied when an enemy is defeated.")]
+    [SerializeField] private float killReward = 1.0f;
+
+    [Tooltip("Reward applied when an enemy is hit. (Call RegisterHit() from projectile)")]
     [SerializeField] private float hitReward = 0.5f;
 
-    [Tooltip("Tiny reward for staying close to the enemy to prevent cowardice.")]
+    [Tooltip("Reward for reaching the exit door.")]
+    [SerializeField] private float exitReward = 1.0f;
+
+    [Tooltip("Reward applied when collecting a treasure.")]
+    [SerializeField] private float treasureReward = 1f;
+
+    [Tooltip("Reward applied for staying close to the enemy to prevent cowardice.")]
     [SerializeField] private float proximityBonus = 0.001f;
 
     private PlayerMovement _movement;
@@ -45,18 +57,21 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
         AddReward(damagePenalty);
     }
 
-    /// <summary>
-    /// Call this from your Projectile/Combat script when this agent deals damage.
-    /// </summary>
-    public void RegisterHit()
+    public void RegisterKill()
     {
-        AddReward(hitReward);
+        AddReward(killReward);
     }
+
+    public void RegisterDeath() { AddReward(deathPenalty); }
+
+    public void RegisterHit() { AddReward(hitReward); }
 
     public override void OnEpisodeBegin()
     {
         // ArenaManager handles the physical reset
     }
+
+    public void RegisterExit() { AddReward(exitReward); }
 
     public override void CollectObservations(VectorSensor sensor)
     {
@@ -110,12 +125,10 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
             _shot.ApplyShoot(true, shootDir);
         }
 
-        // --- Reward Logic ---
-
-        // 1. Existence Penalty
+        // Existence Penalty
         AddReward(existencePenalty);
 
-        // 2. Proximity Bonus (To fight cowardice)
+        // Proximity Bonus
         if (_arena != null && _arena.trainingEnemies.Count > 0 && _arena.trainingEnemies[0] != null)
         {
             float dist = Vector2.Distance(transform.position, _arena.trainingEnemies[0].transform.position);
@@ -138,5 +151,10 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
         else if (Input.GetKey(KeyCode.LeftArrow)) discreteActions[0] = 3;
         else if (Input.GetKey(KeyCode.RightArrow)) discreteActions[0] = 4;
         else discreteActions[0] = 0;
+    }
+
+    public void RegisterTreasureCollect()
+    {
+        AddReward(treasureReward);
     }
 }
