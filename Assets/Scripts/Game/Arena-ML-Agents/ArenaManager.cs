@@ -7,6 +7,12 @@ using ScriptableObjects;
 
 public class ArenaManager : MonoBehaviour 
 {
+    [Header("Episode Control")]
+    [Tooltip("If true, reaching the exit door ends the episode and resets the arena.")]
+    public bool endEpisodeOnExit = true;
+    [Tooltip("If true, defeating all enemies ends the episode and resets the arena.")]
+    public bool endEpisodeByEliminatingEnemies = true;
+
     [Header("Training Entities")]
     public List<EnemyController> trainingEnemies = new List<EnemyController>();
     public List<TopdownEnemySO> trainingEnemyData = new List<TopdownEnemySO>(); 
@@ -17,8 +23,6 @@ public class ArenaManager : MonoBehaviour
     [Header("Spawn Settings")]
     public Vector2 playerSpawnPos = new Vector2(10.68f, 2.65f);
     public Vector2 enemySpawnPos = new Vector2(6.17f, 3.50f);
-    
-
     
     private PlayerController _playerController;
     private HealthController _playerHealth;
@@ -98,13 +102,29 @@ public class ArenaManager : MonoBehaviour
     {
         _remainingEnemies--;
         
-        // Give a positive reward for a kill
-        _playerAgent?.AddReward(1.0f); 
+        // Give a positive reward for the kill (value stored in PlayerMLAgent)
+        _playerAgent?.RegisterKill();
         
+
+
         if (_remainingEnemies <= 0)
         {
-            // FIX 3: EndEpisode() is the correct MLAgents command
-            _playerAgent?.EndEpisode(); 
+            if (endEpisodeByEliminatingEnemies)
+            {
+                _playerAgent?.EndEpisode();
+                ResetTrainingCycle();
+            }
+        }
+    }
+
+    public void RegisterExitReached()
+    {
+        // Grant the exit reward
+        _playerAgent?.RegisterExit();
+
+        if (endEpisodeOnExit)
+        {
+            _playerAgent?.EndEpisode();
             ResetTrainingCycle();
         }
     }
@@ -125,6 +145,11 @@ public class ArenaManager : MonoBehaviour
             if (enemy == null) continue;
 
             enemy.gameObject.SetActive(true);
+
+            // Re-enable colliders that were disabled during death {enemyController's Die()}
+            var cols = enemy.GetComponentsInChildren<Collider2D>();
+            foreach (var c in cols) c.enabled = true;
+
             if (playerTransform != null) enemy.target = playerTransform;
             if (enemy.TryGetComponent(out HealthController eHealth)) eHealth.ResetHealth();
             
@@ -179,8 +204,7 @@ public class ArenaManager : MonoBehaviour
     {
         if (e.PlayerHealth <= 0)
         {
-            // Give a negative reward for dying before resetting
-            _playerAgent?.AddReward(-1.0f);
+            _playerAgent?.RegisterDeath(); // Give a negative reward for dying before resetting
             _playerAgent?.EndEpisode();
             ResetTrainingCycle();
         }
