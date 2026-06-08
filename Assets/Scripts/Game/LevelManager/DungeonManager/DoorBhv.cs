@@ -143,8 +143,11 @@ namespace Game.LevelManager.DungeonManager
             // just reward the agent for finishing 
             if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode)
             {
-                if (_arenaManager != null)
+                PlayerMLAgent agent = other.GetComponent<PlayerMLAgent>();
+                if (agent != null && _arenaManager != null)
+                {
                     _arenaManager.RegisterExitReached();
+                }
                 return;
             }
             

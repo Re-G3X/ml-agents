@@ -72,7 +72,6 @@ namespace Game.GameManager.Player
             // If health is still > 0, do nothing
             if (eventArgs.PlayerHealth > 0) return;
 
-            // --- ADD THIS BLOCK HERE ---
             // Check our Singleton to see if we should actually "die"
             if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode)
             {

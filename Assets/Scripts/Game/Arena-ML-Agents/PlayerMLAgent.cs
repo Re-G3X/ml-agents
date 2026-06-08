@@ -37,6 +37,7 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
     private PlayerShot _shot;
     private HealthController _health;
     private ArenaManager _arena;
+    private bool _shootPressedLastFrame = false; // for the new shooting system
 
     public override void Initialize()
     {
@@ -124,6 +125,10 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
             }
             _shot.ApplyShoot(true, shootDir);
         }
+        else
+        {
+            _shot.ApplyShoot(false, Vector2.zero);   // stops firing
+        }
 
         // Existence Penalty
         AddReward(existencePenalty);
@@ -141,10 +146,12 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {
+        // --- Movement ---
         var continuousActions = actionsOut.ContinuousActions;
         continuousActions[0] = Input.GetAxisRaw("Horizontal");
         continuousActions[1] = Input.GetAxisRaw("Vertical");
 
+        // --- Shooting (hold to auto‑fire, release to stop) ---
         var discreteActions = actionsOut.DiscreteActions;
         if (Input.GetKey(KeyCode.UpArrow)) discreteActions[0] = 1;
         else if (Input.GetKey(KeyCode.DownArrow)) discreteActions[0] = 2;
