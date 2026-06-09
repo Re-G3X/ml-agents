@@ -9587,7 +9587,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 094ed29a468e07445b316adf4f6e2290, type: 2}
   treasurePrefab: {fileID: 6115172226947825760, guid: f0704f0159b0ba54b8e39e58b803d870,
     type: 3}
-  numberOfTreasures: 3
+  numberOfTreasures: 2
   treasures:
   - {fileID: 0}
   playerSpawnPos: {x: 10.68, y: 2.65}

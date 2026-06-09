@@ -14,13 +14,14 @@
             [Tooltip("If true, defeating all enemies ends the episode and resets the arena.")]
             public bool endEpisodeByEliminatingEnemies = true;
             [Header("Room Reference")]
+            [Tooltip("Insert the room, with the RoomBhv script, where the training will happen.")]
             public RoomBhv roomBhv;
             [Header("Training Entities")]
             public List<EnemyController> trainingEnemies = new List<EnemyController>();
             public List<TopdownEnemySO> trainingEnemyData = new List<TopdownEnemySO>(); 
             
             [Header("Treasure Settings")]
-            [Tooltip("Assets/Prefabs/ML-Agents/Treasure.prefab.")]
+            [Tooltip("Assets/Prefabs/ML-Agents/Treasure.prefab")]
             [SerializeField] private GameObject treasurePrefab;   // insert treasure prefab here
             [SerializeField] private int numberOfTreasures = 3;    // how many treasures will be spawn
             [HideInInspector] public List<GameObject> treasures = new List<GameObject>(); // hidden because its populated in runtime
