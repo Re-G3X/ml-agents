@@ -41,6 +41,9 @@ namespace Game.EnemyManager
         private IEnumerator BeginAttackRoutine()
         {
             yield return new WaitForSeconds(WaitForStartTimer);
+            // Safety: wait until PlayerObj is assigned
+            while (PlayerObj == null)
+                yield return null;
             yield return StartCoroutine(UseSkill());
         }
 
@@ -77,31 +80,52 @@ namespace Game.EnemyManager
         public override void LoadEnemyData(EnemySO enemyData, int questId)
         {
             base.LoadEnemyData(enemyData, questId);
+
+            // Apply color only if HeadObject exists
+            if (HeadObject != null)
+            {
+                HeadObject.GetComponent<SpriteRenderer>().color = GetColorBasedOnMovement();
+            }
+
+            // Assign projectile data ~first~
             ProjectilePrefab = enemyData.weapon.Projectile.projectilePrefab;
             ProjectileType = enemyData.weapon.Projectile;
+
             if (ProjectilePrefab != null)
             {
                 if (ProjectilePrefab.name == "EnemyBomb")
                 {
-                    if (EnemyData is TopdownEnemySO edd)
-                        edd.attackSpeed /= 2.0f;
+                    // Calculate bomb cooldown without modifying the asset 
+                    //  (which was being slowed down for whatever reasons)
+                    float bombAttackSpeed = (EnemyData is TopdownEnemySO edd) ? edd.attackSpeed : 1.0f;
+                    // Bombs fire at half the rate (original design intent)
+                    float adjustedSpeed = bombAttackSpeed / 2.0f;
+                    CooldownTime = (adjustedSpeed > 0) ? 1.0f / adjustedSpeed : 0.5f;
+
                     SetColors(enemyColorPalette.MainColorA, enemyColorPalette.DetailColorA);
                 }
                 else
                 {
+                    // Non‑bomb projectiles use the attack speed directly
+                    if (EnemyData is TopdownEnemySO ed)
+                    {
+                        CooldownTime = (ed.attackSpeed > 0) ? 1.0f / ed.attackSpeed : 0.5f;
+                        ProjectileSpeed = ed.projectileSpeed * 4;
+                    }
                     SetColors(enemyColorPalette.MainColorB, enemyColorPalette.DetailColorB);
-
                 }
             }
             else
             {
                 SetColors(enemyColorPalette.MainColorC, enemyColorPalette.DetailColorC);
             }
-            if (EnemyData is TopdownEnemySO ed)
+
+            // Stop and restart attack routine ~secondly~ after all data is set
+            if (_attackRoutine != null)
             {
-                CooldownTime = 1.0f / ed.attackSpeed;
-                ProjectileSpeed = ed.projectileSpeed * 4;
+                StopCoroutine(_attackRoutine);
             }
+            _attackRoutine = StartCoroutine(BeginAttackRoutine());
         }
 
         private void SetColors(Color mainColor, Color detailColor)

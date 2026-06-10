@@ -224,6 +224,7 @@ namespace Game.GameManager
             }
             else
             {
+                Debug.LogWarning($"[{gameObject.name}] MovementSO or movementType is null. EnemyData.movement={EnemyData?.movement}, movementType={EnemyData?.movement?.movementType}");
                 // Fallback: Just move toward the player
                 targetMoveDir = (playerPosition - currentPosition).normalized;
                 // Debug.Log($"[AI] No MovementSO on {EnemyData.name}, using direct follow.");
@@ -316,6 +317,12 @@ namespace Game.GameManager
                 int resolvedHealth = (EnemyData is TopdownEnemySO ed) ? ed.health : (int)EnemyData.status1;
                 _healthController.SetHealth(resolvedHealth);
             }
+
+            // Initialize the movement delegate if it wasn't set (which is an issue in arena mode)
+            if (EnemyData != null && EnemyData.movement != null && EnemyData.movement.movementType == null)
+            {
+                EnemyData.movement.movementType = EnemyLoader.GetMovementType(EnemyData.movement.enemyMovementIndex);
+            }
         }
 
         // Child classes (like Skeleton) will override this to color their swords/armor
@@ -333,6 +340,12 @@ namespace Game.GameManager
 
         protected Color GetColorBasedOnMovement()
         {
+            // Safety: if data is missing, return a default color to avoid crash
+            if (EnemyData == null || EnemyData.movement == null)
+            {
+                return Color.white;  // or enemyColorPalette?.MainColorD ?? Color.white
+            }
+
             switch (EnemyData.movement.enemyMovementIndex)
             {
                 case Enums.MovementEnum.Random:
@@ -351,7 +364,7 @@ namespace Game.GameManager
             }
         }
 
-                protected Color OriginalColor
+        protected Color OriginalColor
         {
             get => _originalColor;
             set

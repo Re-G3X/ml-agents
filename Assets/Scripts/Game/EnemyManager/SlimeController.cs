@@ -19,6 +19,8 @@ namespace Game.EnemyManager
 
         private Color GetEyeColorBasedOnMovement()
         {
+            if (EnemyData == null || EnemyData.movement == null)
+                return Color.white; 
             switch (EnemyData.movement.enemyMovementIndex)
             {
                 case Enums.MovementEnum.Random:

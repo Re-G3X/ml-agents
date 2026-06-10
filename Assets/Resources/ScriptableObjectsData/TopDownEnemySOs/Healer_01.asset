@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f2413ad3f93b0bb499b37e429c895be7, type: 3}
-  m_Name: Skeleton_01
+  m_Name: Healer_01
   m_EditorClassIdentifier: Project.ScripableObjects::ScriptableObjects.TopdownEnemySO
   status1: 0
   status2: 0
@@ -21,12 +21,12 @@ MonoBehaviour:
   weaponStatus1: 0
   fitness: 0
   weapon: {fileID: 11400000, guid: f4445d2465c5cf047a9172da116aaca2, type: 2}
-  movement: {fileID: 11400000, guid: 1262a9f5d0325334caa82311f51249ae, type: 2}
-  behavior: {fileID: 11400000, guid: 78d0dfa0919bf9a4b95a59b6832e3caa, type: 2}
-  health: 3
-  damage: 1
-  movementSpeed: 2
-  activeTime: 5
-  restTime: 1
-  attackSpeed: 3
-  projectileSpeed: 3
+  movement: {fileID: 11400000, guid: b5d829e8ad647454d92b26d6076ba985, type: 2}
+  behavior: {fileID: 11400000, guid: e5a72aa6a8a412d49baba3e9fb91909d, type: 2}
+  health: 5
+  damage: 0
+  movementSpeed: 1
+  activeTime: 0
+  restTime: 0
+  attackSpeed: 0
+  projectileSpeed: 0

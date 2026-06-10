@@ -20,13 +20,13 @@ MonoBehaviour:
   status6: 0
   weaponStatus1: 0
   fitness: 0
-  weapon: {fileID: 0}
-  movement: {fileID: 0}
-  behavior: {fileID: 0}
+  weapon: {fileID: 11400000, guid: 76e26f142b9657047982d5625e65bac0, type: 2}
+  movement: {fileID: 11400000, guid: 228c43875b7ea864fb42db557610e3d2, type: 2}
+  behavior: {fileID: 11400000, guid: 7352eddfe7fc8e34dbc77c370d90c8bf, type: 2}
   health: 1
   damage: 2
   movementSpeed: 2
   activeTime: 5
-  restTime: 0
+  restTime: 1
   attackSpeed: 3
   projectileSpeed: 3

@@ -87,6 +87,12 @@ namespace Game.DataCollection
 
         private void Awake()
         {
+            // disabling playerdatacontroller.cs in arena mode, so errors don't pop on console
+            if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode)
+            {
+                this.enabled = false;
+                return;
+            }
             _gameplayData = new GameplayData();
         }
 

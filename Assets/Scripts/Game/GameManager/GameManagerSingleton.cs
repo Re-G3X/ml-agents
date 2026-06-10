@@ -29,7 +29,10 @@ namespace Game.GameManager
         public static event FormAnsweredEvent PreTestFormQuestionAnsweredEventHandler;
         private bool _hasLoaded;
 
-        // This is your master switch for the GhostFlow logic
+        [Header("Arena Mode (for ml-agents training)")]
+        [Tooltip("When enabled, activates the simplified arena environment for ML-Agents training. " +
+        "This bypasses the main game's quests, dialogue, data collection, and room transitions, " +
+        "and enables the arena-specific reward and reset logic.")]
         public bool arenaMode;
 
         private void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
