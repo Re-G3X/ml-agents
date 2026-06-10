@@ -24,7 +24,7 @@ MonoBehaviour:
   movement: {fileID: 11400000, guid: 1262a9f5d0325334caa82311f51249ae, type: 2}
   behavior: {fileID: 11400000, guid: 78d0dfa0919bf9a4b95a59b6832e3caa, type: 2}
   health: 5
-  damage: 1
+  damage: 3
   movementSpeed: 1.3
   activeTime: 5
   restTime: 1

@@ -76,32 +76,11 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        if (_health == null || _arena == null) 
-        {
-            for (int i = 0; i < 6; i++) { sensor.AddObservation(0f); }
-            return;
-        }
-
-        // 1. Health Ratio (1 float)
-        sensor.AddObservation((float)_health.GetHealth() / _health.GetMaxHealth());
-
-        // 2. Position (Vector2 = 2 floats)
-        sensor.AddObservation((Vector2)transform.localPosition); 
-
-        // 3. Enemy Data (3 floats total)
-        if (_arena.trainingEnemies != null && _arena.trainingEnemies.Count > 0 && _arena.trainingEnemies[0] != null)
-        {
-            Transform enemy = _arena.trainingEnemies[0].transform;
-            Vector2 toEnemy = (enemy.position - transform.position).normalized;
-            
-            sensor.AddObservation(toEnemy); // 2 floats
-            sensor.AddObservation(Vector2.Distance(transform.position, enemy.position)); // 1 float
-        }
+        // health ratio is added manually, and the Ray Perception Sensor adds the rest of observations.
+        if (_health != null)
+            sensor.AddObservation((float)_health.GetHealth() / _health.GetMaxHealth());
         else
-        {
-            sensor.AddObservation(Vector2.zero);
             sensor.AddObservation(0f);
-        }
     }
 
     public override void OnActionReceived(ActionBuffers actions)
