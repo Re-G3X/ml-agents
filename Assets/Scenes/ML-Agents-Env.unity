@@ -9751,6 +9751,21 @@ MonoBehaviour:
   endEpisodeOnExit: 1
   endEpisodeByEliminatingEnemies: 1
   roomBhv: {fileID: 381114963}
+  enemyTypes:
+  - prefab: {fileID: 3099337375910001205, guid: d804a763cebb7f242ab0f6ac5d1f2182,
+      type: 3}
+    data: {fileID: 11400000, guid: 97a25f26e7fa0da4b98535a8b458c9e3, type: 2}
+  - prefab: {fileID: 3243558555302147146, guid: 7da8355fe1303cd439bd3128d6b398fd,
+      type: 3}
+    data: {fileID: 11400000, guid: 76a997c38c3e536429da96275ae13557, type: 2}
+  - prefab: {fileID: 8704823372456824318, guid: 8752af3dee1319c47a8673d7fcc78cc2,
+      type: 3}
+    data: {fileID: 11400000, guid: f37b1d3c81785e54188e9ff8249c8062, type: 2}
+  - prefab: {fileID: 3719394296243891228, guid: 70ca06cf753b0db4d94ad7c70ccd1724,
+      type: 3}
+    data: {fileID: 11400000, guid: b48b49a613866f84284bfe073fa522b8, type: 2}
+  minEnemies: 1
+  maxEnemies: 3
   trainingEnemies:
   - {fileID: 8284508946752861871}
   - {fileID: 536160272}

@@ -17,8 +17,13 @@
             [Tooltip("Insert the room, with the RoomBhv script, where the training will happen.")]
             public RoomBhv roomBhv;
             [Header("Training Entities")]
-            public List<EnemyController> trainingEnemies = new List<EnemyController>();
-            public List<TopdownEnemySO> trainingEnemyData = new List<TopdownEnemySO>(); 
+            [SerializeField] private List<EnemySpawnConfig> enemyTypes = new List<EnemySpawnConfig>();
+            [SerializeField] private int minEnemies = 1;
+            [SerializeField] private int maxEnemies = 3;
+
+            // Populated at runtime, do not assign manually
+            [HideInInspector] public List<EnemyController> trainingEnemies = new List<EnemyController>();
+            [HideInInspector] public List<TopdownEnemySO> trainingEnemyData = new List<TopdownEnemySO>();
             
             [Header("Treasure Settings")]
             [Tooltip("Assets/Prefabs/ML-Agents/Treasure.prefab")]
@@ -28,13 +33,21 @@
             
             [Header("Spawn Settings")]
             public Vector2 playerSpawnPos = new Vector2(10.68f, 2.65f);
-            
+
+            [System.Serializable]
+            public struct EnemySpawnConfig
+            {
+                public GameObject prefab;
+                public TopdownEnemySO data;
+            }
+
             private PlayerController _playerController;
             private HealthController _playerHealth;
             private int _remainingEnemies = 0;
-            
-            // FIX 1: Use the new class name to avoid conflict with Dialogue Agent
             private PlayerMLAgent _playerAgent; 
+            private bool _isResetting = false;
+
+
 
             void OnEnable()
             {
@@ -60,12 +73,12 @@
                     _playerController = playerObj.GetComponent<PlayerController>();
                     _playerHealth = playerObj.GetComponent<HealthController>();
                     
-                    // FIX 2: Grabbing the updated ML component name
+                    // 3. grab the updated ML component name
                     _playerAgent = playerObj.GetComponent<PlayerMLAgent>();
                 }
 
                 CleanupMainGameSystems();
-                InitializeArena();
+                SpawnEnemies();
 
                 // Create treasure pool
                 foreach (Transform child in transform)
@@ -85,7 +98,7 @@
                 ScatterTreasures();
             }
 
-            // New helper method
+            // Randomized treasure population 
             private void ScatterTreasures()
             {
                 if (roomBhv == null || roomBhv.spawnPoints.Count == 0) return;
@@ -97,6 +110,58 @@
                     treasure.transform.position = roomBhv.spawnPoints[idx];
                     treasure.SetActive(true);
                 }
+            }
+
+            // randomized enemy population
+            private void SpawnEnemies()
+            {
+                // 1. Destroy old enemy instances
+                foreach (var enemy in trainingEnemies)
+                {
+                    if (enemy != null) Destroy(enemy.gameObject);
+                }
+                trainingEnemies.Clear();
+                trainingEnemyData.Clear();
+
+                // 2. Find player reference
+                GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+
+                // 3. Random count
+                int count = Random.Range(minEnemies, maxEnemies + 1);
+
+                for (int i = 0; i < count; i++)
+                {
+                    // Pick random enemy type
+                    var config = enemyTypes[Random.Range(0, enemyTypes.Count)];
+
+                    // Instantiate
+                    GameObject instance = Instantiate(config.prefab, transform);
+                    instance.name = config.data.name + "_" + i;
+
+                    // Get controller
+                    var controller = instance.GetComponent<EnemyController>();
+                    if (controller != null)
+                    {
+                        // Set player reference
+                        if (playerObj != null)
+                        {
+                            controller.target = playerObj.transform;
+                            controller.SetPlayerObject(playerObj);
+                        }
+
+                        // Load data (this also initializes movement delegate)
+                        controller.LoadEnemyData(config.data, 1);
+                        controller.enabled = true;
+                    }
+
+                    trainingEnemies.Add(controller);
+                    trainingEnemyData.Add(config.data);
+                }
+
+                _remainingEnemies = count;
+
+                // 4. Randomize positions using existing spawn points
+                ForcePositions();
             }
 
             private void CleanupMainGameSystems()
@@ -111,37 +176,13 @@
                 foreach (var pd in FindObjectsByType<Game.DataCollection.PlayerDataController>(FindObjectsSortMode.None)) pd.enabled = false;
             }
 
-            void InitializeArena()
-            {
-                GameObject playerObj = GameObject.FindGameObjectWithTag("Player"); 
-
-                for (int i = 0; i < trainingEnemies.Count; i++)
-                {
-                    var enemy = trainingEnemies[i];
-                    if (enemy == null) continue;
-
-                    if (playerObj != null) enemy.target = playerObj.transform;
-
-                    if (i < trainingEnemyData.Count)
-                    {
-                        enemy.LoadEnemyData(trainingEnemyData[i], 1);
-                        enemy.enabled = false;
-                        enemy.enabled = true;
-                    }
-
-                    _remainingEnemies++;
-                }
-                ForcePositions();
-            }
-
             public void RegisterKill()
             {
-                _remainingEnemies--;
-                
-                // Give a positive reward for the kill (value stored in PlayerMLAgent)
-                _playerAgent?.RegisterKill();
-                
+                // ignore kills that happen during a reset cycle
+                if (_isResetting) return;
 
+                _remainingEnemies--;
+                _playerAgent?.RegisterKill(); // give a positive reward for the kill (value stored in PlayerMLAgent)
 
                 if (_remainingEnemies <= 0)
                 {
@@ -167,47 +208,19 @@
 
             public void ResetTrainingCycle()
             {
+                _isResetting = true;   // <-- locks the reseting cycle process
+
                 if (_playerController != null)
                 {
                     _playerController.ResetHealth(); 
                     if (_playerHealth != null) _playerHealth.ResetHealth();
                 }
 
-                Transform playerTransform = _playerController != null ? _playerController.transform : null;
-
-                for (int i = 0; i < trainingEnemies.Count; i++)
-                {
-                    var enemy = trainingEnemies[i];
-                    if (enemy == null) continue;
-
-                    enemy.gameObject.SetActive(true);
-
-                    // Re-enable colliders that were disabled during death {enemyController's Die()}
-                    var cols = enemy.GetComponentsInChildren<Collider2D>();
-                    foreach (var c in cols) c.enabled = true;
-
-                    if (playerTransform != null) enemy.target = playerTransform;
-                    if (enemy.TryGetComponent(out HealthController eHealth)) eHealth.ResetHealth();
-                    
-                    if (enemy.TryGetComponent(out Animator anim))
-                    {
-                        anim.Rebind();
-                        anim.Update(0f);
-                    }
-                    
-                    enemy.enabled = true;
-                    
-                    if (i < trainingEnemyData.Count)
-                    {
-                        enemy.LoadEnemyData(trainingEnemyData[i], 1);
-                    }
-                }
-
-                // scatters all treasures
+                SpawnEnemies();
                 ScatterTreasures();
-
-                _remainingEnemies = trainingEnemies.Count;
                 ForcePositions();
+
+                _isResetting = false;  // <-- unlocks the reseting cycle process
             }
 
             private void ForcePositions()

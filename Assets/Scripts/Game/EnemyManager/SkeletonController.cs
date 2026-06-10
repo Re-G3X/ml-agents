@@ -66,12 +66,6 @@ namespace Game.EnemyManager
         protected override void StartDeath()
         {
             base.StartDeath();
-            
-            if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode)
-            {
-                // Send the "amountOfKills += 1" message
-                Object.FindAnyObjectByType<ArenaManager>()?.RegisterKill();
-            }
 
             if (Sword.activeSelf)
             {

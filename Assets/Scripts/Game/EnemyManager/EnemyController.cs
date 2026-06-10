@@ -325,6 +325,13 @@ namespace Game.GameManager
             }
         }
 
+
+        // ensures new enemies always have a valid player reference (regardless of DungeonPlayer being absent in arena mode)
+        public void SetPlayerObject(GameObject playerObj)
+        {
+            PlayerObj = playerObj; 
+        }
+        
         // Child classes (like Skeleton) will override this to color their swords/armor
 
         // ~ enemy visuals ~ //
