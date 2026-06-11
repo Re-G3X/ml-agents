@@ -27,6 +27,9 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
     [Tooltip("Reward for reaching the exit door.")]
     [SerializeField] private float exitReward = 1.0f;
 
+    [Tooltip("Shaping reward per unit moved toward the door (positive = encourage approach).")]
+    [SerializeField] private float doorApproachReward = 0.1f;
+
     [Tooltip("Reward applied when collecting a treasure.")]
     [SerializeField] private float treasureReward = 1f;
 
@@ -37,7 +40,8 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
     private PlayerShot _shot;
     private HealthController _health;
     private ArenaManager _arena;
-    private bool _shootPressedLastFrame = false; // for the new shooting system
+    private bool _shootPressedLastFrame = false; // necessary for the new shooting system
+    private float _prevDist;   // previous distance to the door
 
     public override void Initialize()
     {
@@ -69,14 +73,15 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
 
     public override void OnEpisodeBegin()
     {
-        // ArenaManager handles the physical reset
+        GameObject door = GameObject.FindGameObjectWithTag("Door");
+        _prevDist = door ? Vector2.Distance(transform.position, door.transform.position) : Mathf.Infinity;
     }
 
     public void RegisterExit() { AddReward(exitReward); }
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        // health ratio is added manually, and the Ray Perception Sensor adds the rest of observations.
+        // health ratio is added manually, and the Ray Perception Sensor adds the rest of observations automatically.
         if (_health != null)
             sensor.AddObservation((float)_health.GetHealth() / _health.GetMaxHealth());
         else
@@ -107,6 +112,16 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
         else
         {
             _shot.ApplyShoot(false, Vector2.zero);   // stops firing
+        }
+        
+        // Potential‑based shaping: reward for moving toward the door, penalty for moving away
+        GameObject door = GameObject.FindGameObjectWithTag("Door");
+        if (door != null)
+        {
+            float currentDist = Vector2.Distance(transform.position, door.transform.position);
+            float reward = (_prevDist - currentDist) * doorApproachReward;  // uses the Inspector variable
+            AddReward(reward);
+            _prevDist = currentDist;
         }
 
         // Existence Penalty

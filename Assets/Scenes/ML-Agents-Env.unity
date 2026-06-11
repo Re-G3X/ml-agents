@@ -9519,8 +9519,8 @@ MonoBehaviour:
   - prefab: {fileID: 3719394296243891228, guid: 70ca06cf753b0db4d94ad7c70ccd1724,
       type: 3}
     data: {fileID: 11400000, guid: b48b49a613866f84284bfe073fa522b8, type: 2}
-  minEnemies: 1
-  maxEnemies: 3
+  minEnemies: 0
+  maxEnemies: 0
   trainingEnemies:
   - {fileID: 0}
   - {fileID: 0}
@@ -9533,7 +9533,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 094ed29a468e07445b316adf4f6e2290, type: 2}
   treasurePrefab: {fileID: 6115172226947825760, guid: f0704f0159b0ba54b8e39e58b803d870,
     type: 3}
-  numberOfTreasures: 3
+  numberOfTreasures: 0
   treasures:
   - {fileID: 0}
   playerSpawnPos: {x: 10.68, y: 2.65}
@@ -10153,7 +10153,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.ML-Agents::Unity.MLAgents.Policies.BehaviorParameters
   m_BrainParameters:
-    VectorObservationSize: 6
+    VectorObservationSize: 1
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 2
@@ -10186,14 +10186,15 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  MaxStep: 100
-  existencePenalty: -0.0005
-  deathPenalty: -1
-  damagePenalty: -0.1
-  killReward: 1
-  hitReward: 0.7
+  MaxStep: 0
+  existencePenalty: 0
+  deathPenalty: 0
+  damagePenalty: 0
+  killReward: 0
+  hitReward: 0
   exitReward: 1
-  treasureReward: 1
+  doorApproachReward: 0.1
+  treasureReward: 0
   proximityBonus: 0
 --- !u!114 &2057696085
 MonoBehaviour:
@@ -10231,7 +10232,7 @@ MonoBehaviour:
   m_RaysPerDirection: 4
   m_MaxRayDegrees: 180
   m_SphereCastRadius: 0
-  m_RayLength: 25
+  m_RayLength: 13
   m_RayLayerMask:
     serializedVersion: 2
     m_Bits: 23041
