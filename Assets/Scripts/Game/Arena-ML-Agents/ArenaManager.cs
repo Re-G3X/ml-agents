@@ -19,7 +19,7 @@
             [Header("Training Entities")]
             [SerializeField] private List<EnemySpawnConfig> enemyTypes = new List<EnemySpawnConfig>();
             [SerializeField] private int minEnemies = 1;
-            [SerializeField] private int maxEnemies = 3;
+            [SerializeField] private int maxEnemies = 5;
 
             // Populated at runtime, do not assign manually
             [HideInInspector] public List<EnemyController> trainingEnemies = new List<EnemyController>();
@@ -28,11 +28,14 @@
             [Header("Treasure Settings")]
             [Tooltip("Assets/Prefabs/ML-Agents/Treasure.prefab")]
             [SerializeField] private GameObject treasurePrefab;   // insert treasure prefab here
-            [SerializeField] private int numberOfTreasures = 3;    // how many treasures will be spawn
+            [SerializeField] private int minTreasures = 1;
+            [SerializeField] private int maxTreasures = 5;
             [HideInInspector] public List<GameObject> treasures = new List<GameObject>(); // hidden because its populated in runtime
             
             [Header("Spawn Settings")]
             public Vector2 playerSpawnPos = new Vector2(10.68f, 2.65f);
+            [Tooltip("Fixed position for the main camera during arena episodes.")]
+            public Vector2 cameraPosition = new Vector2(10.89f, 3.0f); 
 
             [System.Serializable]
             public struct EnemySpawnConfig
@@ -80,24 +83,20 @@
                 CleanupMainGameSystems();
                 SpawnEnemies();
 
-                // Create treasure pool
-                foreach (Transform child in transform)
-                {
-                    if (child.CompareTag("Treasure")) Destroy(child.gameObject);
-                }
-                treasures.Clear();
-
-                for (int i = 0; i < numberOfTreasures; i++)
+                // Create treasure pool (random count each episode)
+                int treasureCount = Random.Range(minTreasures, maxTreasures + 1);
+                for (int i = 0; i < treasureCount; i++)
                 {
                     GameObject t = Instantiate(treasurePrefab, transform);
                     t.name = $"Treasure_{i}";
                     treasures.Add(t);
                 }
 
-                // Initial random placement
-                ScatterTreasures();
+                // Random treasure spawn [old ScatterTreasures()]
+                SpawnTreasures();
             }
 
+            /*
             // Randomized treasure population 
             private void ScatterTreasures()
             {
@@ -109,6 +108,36 @@
                     int idx = Random.Range(0, roomBhv.spawnPoints.Count);
                     treasure.transform.position = roomBhv.spawnPoints[idx];
                     treasure.SetActive(true);
+                }
+            }*/
+
+            // randomized treasure population (destroys old treasures and creates new ones)
+            private void SpawnTreasures()
+            {
+                // 1. Destroy old treasure instances
+                foreach (var treasure in treasures)
+                {
+                    if (treasure != null) Destroy(treasure);
+                }
+                treasures.Clear();
+
+                // 2. Random count
+                int count = Random.Range(minTreasures, maxTreasures + 1);
+
+                for (int i = 0; i < count; i++)
+                {
+                    // 3. Instantiate new treasure from prefab
+                    GameObject t = Instantiate(treasurePrefab, transform);
+                    t.name = $"Treasure_{i}";
+                    treasures.Add(t);
+
+                    // 4. Place at a random spawn point
+                    if (roomBhv != null && roomBhv.spawnPoints.Count > 0)
+                    {
+                        int idx = Random.Range(0, roomBhv.spawnPoints.Count);
+                        t.transform.position = roomBhv.spawnPoints[idx];
+                    }
+                    t.SetActive(true);
                 }
             }
 
@@ -217,7 +246,7 @@
                 }
 
                 SpawnEnemies();
-                ScatterTreasures();
+                SpawnTreasures();
                 ForcePositions();
 
                 _isResetting = false;  // <-- unlocks the reseting cycle process
@@ -254,7 +283,7 @@
                 // camera spawn
                 if (Camera.main != null)
                 {
-                    Camera.main.transform.position = new Vector3(playerSpawnPos.x, playerSpawnPos.y, Camera.main.transform.position.z);
+                    Camera.main.transform.position = new Vector3(cameraPosition.x, cameraPosition.y, Camera.main.transform.position.z);
                 }
             }
 

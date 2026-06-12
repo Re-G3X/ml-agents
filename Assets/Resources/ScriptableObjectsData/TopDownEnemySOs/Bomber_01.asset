@@ -23,10 +23,10 @@ MonoBehaviour:
   weapon: {fileID: 11400000, guid: 47b8db2b014647145bdbd766c2640dfe, type: 2}
   movement: {fileID: 11400000, guid: b5d829e8ad647454d92b26d6076ba985, type: 2}
   behavior: {fileID: 11400000, guid: 78d0dfa0919bf9a4b95a59b6832e3caa, type: 2}
-  health: 3
+  health: 4
   damage: 4
   movementSpeed: 0.5
   activeTime: 1
   restTime: 0
-  attackSpeed: 0.5
+  attackSpeed: 1
   projectileSpeed: 1
