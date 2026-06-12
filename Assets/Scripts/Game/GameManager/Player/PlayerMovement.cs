@@ -22,7 +22,7 @@ namespace Game.GameManager.Player
         // --- NEW INPUT HANDLER ---
         public void OnMoveInput(InputAction.CallbackContext context)
         {
-            Debug.Log($"[Movement Check] Input Received! Can move: {_canMove}");
+            //Debug.Log($"[Movement Check] Input Received! Can move: {_canMove}");
             if (!_canMove) return;
             if (context.canceled)
             {
@@ -37,12 +37,12 @@ namespace Game.GameManager.Player
             }
         }
 
-        // --- THE MOTOR (This is what ML-Agents will call) ---
+        // --- THE MOTOR (This is what will be called by ml-agents) ---
         public void ApplyMovement(Vector2 movement)
         {
             if (!_canMove) 
             {
-                Debug.LogWarning("APPLY MOVEMENT CALLED BUT _CANMOVE IS FALSE!");
+                //Debug.LogWarning("APPLY MOVEMENT CALLED BUT _CANMOVE IS FALSE!");
                 return;
             }
             // If the magnitude is very small, treat it as zero to avoid "drifting"
@@ -66,7 +66,7 @@ namespace Game.GameManager.Player
         private void Awake()
         {
             _canMove = true;
-            Debug.Log($"[Movement Check] Awake fired. _canMove is {_canMove}");
+            //Debug.Log($"[Movement Check] Awake fired. _canMove is {_canMove}");
         }
 
         protected override void Start()

@@ -69,11 +69,9 @@ namespace Game.GameManager
 
         private void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
         {
-            // High-priority check: Use the Singleton to check arenaMode
-            // This is safer than FindObjectOfType because it's available the moment the scene starts
             if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode) 
             {
-                Debug.Log("ExperimentController: Arena/Training detected. Narrative selection bypassed.");
+                //Debug.Log("ExperimentController: Arena/Training detected. Narrative selection bypassed.");
                 return; 
             }
 
@@ -135,7 +133,7 @@ namespace Game.GameManager
         private void SetUseRandomProfile()
         {
             _useRandomProfile = generatorSettings.EnableRandomProfileToPlayer && RandomSingleton.GetInstance().Random.Next(0, 100) > generatorSettings.ProbabilityToGetTrueProfile;
-            Debug.Log("Set Use Random Profile to "+_useRandomProfile);
+            //Debug.Log("Set Use Random Profile to "+_useRandomProfile);
         }
 
         private void OnRunComplete(object sender, EventArgs eventArgs)

@@ -21,7 +21,6 @@ namespace Game.GameManager
         public Transform target;
         private bool _isAIActive = false;
         protected bool isResetting = false;
-        private BehaviorType behavior;
         protected static readonly int DieTrigger = Animator.StringToHash("Die");
         private Animator _animator;
         private Color _originalColor;
@@ -40,8 +39,6 @@ namespace Game.GameManager
         public EventHandler<EnemySO> EnemyKilledHandler;
         private Coroutine _walkRoutine;
         
-        // end of variables //
-
         protected virtual void Start()
         {
             // We no longer start the routine here. 
@@ -51,16 +48,9 @@ namespace Game.GameManager
 
         private void FixedUpdate()
         {
-            // 1. REACTIVE GATE: Check if we have data/target yet
             if (!_isAIActive)
             {
                 CheckReadiness();
-            }
-
-            // 2. PHYSICS CONSISTENCY: Ensure we stop moving if resetting
-            if (isResetting && _enemyRigidBody != null)
-            {
-                _enemyRigidBody.linearVelocity = Vector2.zero;
             }
         }
 
@@ -77,8 +67,6 @@ namespace Game.GameManager
             }
             else if (isArena) 
             {
-                // In Arena, we allow it to start 'empty' so it doesn't just stand there,
-                // but our LoadEnemyData fix will now properly REBOOT this later.
                 IsRandomMovement(); 
                 StartAI();
             }
@@ -86,15 +74,7 @@ namespace Game.GameManager
 
         protected virtual void StartAI()
         {
-            // FINAL CHECK: If ArenaManager just injected data, make sure we use it!
-            if (EnemyData == null && GameManagerSingleton.Instance.arenaMode) 
-            {
-                // Try to wait one more frame or check if data is coming
-                // For now, let's just log it.
-            }
-
             _isAIActive = true;
-            Debug.Log($"[AI] {gameObject.name} Logic Activated.");
             
             // Safety: Stop any existing routine before starting a new one
             if (_walkRoutine != null) StopCoroutine(_walkRoutine);
@@ -209,7 +189,7 @@ namespace Game.GameManager
         private Vector2 GetMovementVector(ref Vector2 directionMask, bool updateMask)
         {
             // 1. Modified Safety: We only NEED EnemyData and PlayerObj. 
-            // We don't strictly need .movement if we have a fallback!
+            // We don't need .movement if we have a fallback!
             if (EnemyData == null || PlayerObj == null)
                 return Vector2.zero;
 
@@ -331,8 +311,6 @@ namespace Game.GameManager
         {
             PlayerObj = playerObj; 
         }
-        
-        // Child classes (like Skeleton) will override this to color their swords/armor
 
         // ~ enemy visuals ~ //
 

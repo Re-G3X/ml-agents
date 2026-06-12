@@ -59,7 +59,7 @@ namespace Game.GameManager.Player
 
         private void CheckDeath(object sender, PlayerIsDamagedEventArgs eventArgs)
         {
-            // Always play the blood particles so we can see the hit
+            // Always play the blood particles so the hit is seem
             var mainParticle = bloodParticle.main;
             mainParticle.startSpeed = 0;
             var forceOverLifetime = bloodParticle.forceOverLifetime;
@@ -75,8 +75,8 @@ namespace Game.GameManager.Player
             // Check our Singleton to see if we should actually "die"
             if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode)
             {
-                Debug.Log("[Arena] Death prevented. Resetting health via Arena Mode bypass.");
-                ResetHealth(); // This heals the player back to max
+                //Debug.Log("[Arena] Death prevented. Resetting health via Arena Mode bypass.");
+                ResetHealth(); // heals the player back to max
                 return;        // EXIT EARLY: This prevents the 'PlayerDeathEventHandler' below from firing!
             }
             // ----------------------------

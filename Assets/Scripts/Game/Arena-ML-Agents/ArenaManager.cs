@@ -5,6 +5,7 @@
         using Game.GameManager.Player;
         using ScriptableObjects;
         using Game.LevelManager.DungeonManager;
+        using System.Collections;
 
         public class ArenaManager : MonoBehaviour 
         {
@@ -49,8 +50,8 @@
             private int _remainingEnemies = 0;
             private PlayerMLAgent _playerAgent; 
             private bool _isResetting = false;
-
-
+            [HideInInspector] public bool isEpisodeActive = false; // for PersonaEvaluator.cs to calculate episodes
+            public event System.Action OnEnemyKilled; // to warn personaevaluator.cs about enemies killed
 
             void OnEnable()
             {
@@ -83,33 +84,11 @@
                 CleanupMainGameSystems();
                 SpawnEnemies();
 
-                // Create treasure pool (random count each episode)
-                int treasureCount = Random.Range(minTreasures, maxTreasures + 1);
-                for (int i = 0; i < treasureCount; i++)
-                {
-                    GameObject t = Instantiate(treasurePrefab, transform);
-                    t.name = $"Treasure_{i}";
-                    treasures.Add(t);
-                }
-
                 // Random treasure spawn [old ScatterTreasures()]
                 SpawnTreasures();
+
+                isEpisodeActive = true; // episode is now active for PersonaEvaluator.cs
             }
-
-            /*
-            // Randomized treasure population 
-            private void ScatterTreasures()
-            {
-                if (roomBhv == null || roomBhv.spawnPoints.Count == 0) return;
-
-                foreach (var treasure in treasures)
-                {
-                    if (treasure == null) continue;
-                    int idx = Random.Range(0, roomBhv.spawnPoints.Count);
-                    treasure.transform.position = roomBhv.spawnPoints[idx];
-                    treasure.SetActive(true);
-                }
-            }*/
 
             // randomized treasure population (destroys old treasures and creates new ones)
             private void SpawnTreasures()
@@ -212,31 +191,40 @@
 
                 _remainingEnemies--;
                 _playerAgent?.RegisterKill(); // give a positive reward for the kill (value stored in PlayerMLAgent)
+                OnEnemyKilled?.Invoke(); // calls the OnEnemyKilled event to calculate metrics in personaevaluator.cs
 
                 if (_remainingEnemies <= 0)
                 {
                     if (endEpisodeByEliminatingEnemies)
                     {
-                        _playerAgent?.EndEpisode();
-                        ResetTrainingCycle();
+                        StartCoroutine(EndEpisodeAndReset());
                     }
                 }
             }
 
             public void RegisterExitReached()
             {
-                // Grant the exit reward
+                // Grant the exit reward first
                 _playerAgent?.RegisterExit();
 
                 if (endEpisodeOnExit)
                 {
-                    _playerAgent?.EndEpisode();
-                    ResetTrainingCycle();
+                    StartCoroutine(EndEpisodeAndReset());
                 }
+            }
+
+
+            private IEnumerator EndEpisodeAndReset()
+            {
+                isEpisodeActive = false;
+                _playerAgent?.EndEpisode();
+                yield return null;
+                ResetTrainingCycle();
             }
 
             public void ResetTrainingCycle()
             {
+                isEpisodeActive = true; // for personaevaluator.cs
                 _isResetting = true;   // <-- locks the reseting cycle process
 
                 if (_playerController != null)
@@ -292,8 +280,7 @@
                 if (e.PlayerHealth <= 0)
                 {
                     _playerAgent?.RegisterDeath(); // Give a negative reward for dying before resetting
-                    _playerAgent?.EndEpisode();
-                    ResetTrainingCycle();
+                    StartCoroutine(EndEpisodeAndReset());
                 }
             }
         }

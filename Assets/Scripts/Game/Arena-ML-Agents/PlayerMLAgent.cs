@@ -42,7 +42,9 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
     private ArenaManager _arena;
     private bool _shootPressedLastFrame = false; // necessary for the new shooting system
     private float _prevDist;   // previous distance to the door
-
+    public event System.Action OnTreasureCollected; // event for personaevaluator.cs to calculate treasures collected
+    public event System.Action OnAgentDeath; // same as above, for death calculation over episodes
+    public event System.Action OnAgentExit;  // same as above, for exit calculation
     public override void Initialize()
     {
         _movement = GetComponent<PlayerMovement>();
@@ -67,7 +69,10 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
         AddReward(killReward);
     }
 
-    public void RegisterDeath() { AddReward(deathPenalty); }
+    public void RegisterDeath(){ 
+        AddReward(deathPenalty); 
+        OnAgentDeath?.Invoke();
+    }
 
     public void RegisterHit() { AddReward(hitReward); }
 
@@ -77,7 +82,10 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
         _prevDist = door ? Vector2.Distance(transform.position, door.transform.position) : Mathf.Infinity;
     }
 
-    public void RegisterExit() { AddReward(exitReward); }
+    public void RegisterExit(){ 
+        AddReward(exitReward); 
+        OnAgentExit?.Invoke();   // signal that the agent reached the door
+    }
 
     public override void CollectObservations(VectorSensor sensor)
     {
@@ -157,5 +165,6 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
     public void RegisterTreasureCollect()
     {
         AddReward(treasureReward);
+        OnTreasureCollected?.Invoke();
     }
 }

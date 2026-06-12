@@ -70,7 +70,7 @@ namespace Game.GameManager
             }
             else if (gameObject.CompareTag("Enemy"))
             {
-                // SAFETY GATE: Check if all quest-related data exists before calling the event
+                // SAFETY: Check if all quest-related data exists before calling the event
                 if (_enemyController != null && 
                     _enemyController.EnemyData != null && 
                     _enemyController.EnemyData.weapon != null)
@@ -97,7 +97,7 @@ namespace Game.GameManager
 
         public void ResetHealth()
         {
-            // 1. Dynamic Health Restore (No more hardcoded 10)
+            // 1. Dynamic Health Restore
             if (_maxHealth > 0) 
             {
                 health = _maxHealth;
@@ -143,12 +143,12 @@ namespace Game.GameManager
             if (gameObject.CompareTag("Player"))
             {
                 // We fire it twice: once immediately, and once via a delayed call 
-                // to force the UI out of its "Grey/Dead" state.
+                // to force the UI out of its 'grey/dead' state.
                 RefreshUI();
                 Invoke(nameof(RefreshUI), 0.1f); 
             }
 
-            Debug.Log($"[Health] {gameObject.name} Reset to {health}/{_maxHealth}");
+            //Debug.Log($"[Health] {gameObject.name} Reset to {health}/{_maxHealth}");
         }
 
         private void RefreshUI()

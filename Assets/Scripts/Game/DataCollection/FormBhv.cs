@@ -66,7 +66,7 @@ namespace Game.DataCollection
             // 2. Surgical Shutdown for Arena Mode
             if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode)
             {
-                Debug.Log("Arena Mode: Surgical shutdown of generators.");
+                //Debug.Log("Arena Mode: Surgical shutdown of generators.");
                 MonoBehaviour[] allScripts = FindObjectsOfType<MonoBehaviour>();
                 foreach (var script in allScripts)
                 {
@@ -74,7 +74,7 @@ namespace Game.DataCollection
 
                     string typeName = script.GetType().Name;
                     
-                    // TARGETS: These are the heavy procedural scripts causing the lag
+                    // TARGETS: These are heavy procedural scripts that causes lag
                     bool isGenerator = typeName.Contains("GeneratorManager") || 
                                        typeName.Contains("PcgController") || 
                                        typeName.Contains("QuestGenerator");
@@ -90,15 +90,15 @@ namespace Game.DataCollection
                     {
                         script.StopAllCoroutines();
                         script.enabled = false; 
-                        Debug.Log($"Surgical Kill (Script Only): {typeName}");
+                        //Debug.Log($"Surgical Kill (Script Only): {typeName}");
 
                         // Only deactivate the object if it's a dedicated procedural holder
-                        // Avoid deactivating general "Manager" objects that might house combat logic
+                        // Avoid deactivating general "Manager" objects that might contain combat logic
                         if (typeName == "GeneratorManager" || typeName == "PcgController") 
                         {
                             // Optional: Only do this if it has no other essential scripts
                             script.gameObject.SetActive(false);
-                            Debug.Log($"Object Shutdown: {script.gameObject.name}");
+                            //Debug.Log($"Object Shutdown: {script.gameObject.name}");
                         }
                     }
                 }

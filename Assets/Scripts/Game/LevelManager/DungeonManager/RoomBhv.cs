@@ -21,7 +21,8 @@ namespace Game.LevelManager.DungeonManager
     public class RoomBhv : MonoBehaviour, ISoundEmitter, IQuestElement
     {
         [Header("ML-Agents Training")]
-        public bool manualMode = false; // Set to true for your training room prefab
+        [Tooltip("In case a manual training room prefab (for arena mode) is being used, set this to true.")]
+        public bool manualMode = false; // Set to true in case a manual training room prefab is used
         
         public static event StartRoomEvent StartRoomEventHandler;
         public static event ShowRoomOnMiniMapEvent ShowRoomOnMiniMapEventHandler;
@@ -260,7 +261,7 @@ namespace Game.LevelManager.DungeonManager
 
         private void SetDoorsTransform()
         {
-            // Use the ?. operator to check if the door exists before accessing .transform
+            // checks if the door exists before accessing .transform
             if (doorNorth != null)
                 doorNorth.transform.localPosition = new Vector2(dungeonRoom.Dimensions.Width / 2f, dungeonRoom.Dimensions.Height + 0.5f);
             
@@ -543,13 +544,13 @@ namespace Game.LevelManager.DungeonManager
 
             if (manualMode)
             {
-                Debug.Log($"[{gameObject.name}] Manual Mode: Ensuring Player Initialization.");
+                //Debug.Log($"[{gameObject.name}] Manual Mode: Ensuring Player Initialization.");
                 
                 SetKeysToDoors(); 
                 SelectEnemies();
 
                 // FIX: Always fire the StartRoom event in manual mode so the player "wakes up"
-                // We use the current position because there is no procedural tile data.
+                // we use the current position because there is no procedural tile data.
                 StartRoomEventHandler?.Invoke(this, new StartRoomEventArgs(_availablePosition));
                 
                 _hasBeenVisited = true;
@@ -608,13 +609,13 @@ namespace Game.LevelManager.DungeonManager
                 return; 
             }
 
-            // Add null checks for every door before calling SetTheme
+            // null checks for every door before calling SetTheme
             if (doorEast != null) doorEast.SetTheme(_theme);
             if (doorWest != null) doorWest.SetTheme(_theme);
             if (doorNorth != null) doorNorth.SetTheme(_theme);
             if (doorSouth != null) doorSouth.SetTheme(_theme);
             
-            // Ensure the theme index is within bounds of your lists
+            // Ensure the theme index is within bounds of lists
             int themeIndex = (int)_theme;
             if (themeIndex < NWColumns.Count) _nwColumn = NWColumns[themeIndex];
             if (themeIndex < NEColumns.Count) _neColumn = NEColumns[themeIndex];

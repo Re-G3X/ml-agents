@@ -9703,11 +9703,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 094ed29a468e07445b316adf4f6e2290, type: 2}
   treasurePrefab: {fileID: 6115172226947825760, guid: f0704f0159b0ba54b8e39e58b803d870,
     type: 3}
-  numberOfTreasures: 3
+  minTreasures: 1
+  maxTreasures: 5
   treasures:
   - {fileID: 0}
   playerSpawnPos: {x: 17.36, y: -6.56}
   cameraPosition: {x: 10.68, y: 3}
+  isEpisodeActive: 0
 --- !u!4 &1558472675
 Transform:
   m_ObjectHideFlags: 0
@@ -9723,6 +9725,57 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1653434786
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1653434788}
+  - component: {fileID: 1653434789}
+  m_Layer: 0
+  m_Name: TrainedAgentEvaluator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1653434788
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1653434786}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1653434789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1653434786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f805a414d32472468f202a93597b96b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TrainedAgentEvaluator
+  agent: {fileID: 2057696084}
+  numberOfEpisodes: 10
+  enemiesKilledTotal: 0
+  treasuresCollectedTotal: 0
+  deathsTotal: 0
+  stepsTotal: 0
+  successfulExits: 0
 --- !u!1 &1672966591
 GameObject:
   m_ObjectHideFlags: 0
@@ -10300,10 +10353,6 @@ PrefabInstance:
         type: 3}
       insertIndex: 4
       addedObject: {fileID: 2057696085}
-    - targetCorrespondingSourceObject: {fileID: 1772544863890580, guid: 8fea4dd3f18348d42a4a32bb977123cd,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2057696101}
   m_SourcePrefab: {fileID: 100100000, guid: 8fea4dd3f18348d42a4a32bb977123cd, type: 3}
 --- !u!1 &2057696068 stripped
 GameObject:
@@ -10412,18 +10461,6 @@ MonoBehaviour:
   m_UseBatchedRaycasts: 0
   rayHitColor: {r: 1, g: 0, b: 0, a: 1}
   rayMissColor: {r: 1, g: 1, b: 1, a: 1}
---- !u!114 &2057696101
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2057696068}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6802943fe84497e4c8141c115096a95e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -10437,3 +10474,4 @@ SceneRoots:
   - {fileID: 1558472675}
   - {fileID: 381114962}
   - {fileID: 1202135049}
+  - {fileID: 1653434788}

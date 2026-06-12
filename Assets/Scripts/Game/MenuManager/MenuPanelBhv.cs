@@ -49,9 +49,6 @@ namespace Game.MenuManager
             transform.localPosition = new Vector3(-10000, 0, 0);
             CanvasGroup cg = GetComponent<CanvasGroup>();
             if (cg != null) cg.alpha = 0;
-
-            Debug.Log($"[Arena-Final-Kill] Bypassing UI: {gameObject.name}");
-            
             if (nextPanel != null) nextPanel.SetActive(true);
             gameObject.SetActive(false);
         }
