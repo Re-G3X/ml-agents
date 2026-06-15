@@ -9673,7 +9673,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18859ab3f7ce0334c887be87cd6a16b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Project.Game::ArenaManager
-  endEpisodeOnExit: 0
+  endEpisodeOnExit: 1
   endEpisodeByEliminatingEnemies: 1
   roomBhv: {fileID: 381114963}
   enemyTypes:

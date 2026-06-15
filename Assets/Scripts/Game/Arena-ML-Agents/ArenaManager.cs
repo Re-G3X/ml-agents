@@ -206,8 +206,8 @@
             {
                 if (endEpisodeOnExit)
                 {
-                    _playerAgent?.RegisterExit();   // reward is given ONLY when exit ends the episode
-                    EndEpisodeAndReset();
+                    _playerAgent?.RegisterExit();
+                    StartCoroutine(EndEpisodeAndReset());  
                 }
             }
 
