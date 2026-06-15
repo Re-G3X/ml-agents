@@ -204,12 +204,10 @@
 
             public void RegisterExitReached()
             {
-                // Grant the exit reward first
-                _playerAgent?.RegisterExit();
-
                 if (endEpisodeOnExit)
                 {
-                    StartCoroutine(EndEpisodeAndReset());
+                    _playerAgent?.RegisterExit();   // reward is given ONLY when exit ends the episode
+                    EndEpisodeAndReset();
                 }
             }
 

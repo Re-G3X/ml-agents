@@ -9673,8 +9673,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18859ab3f7ce0334c887be87cd6a16b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Project.Game::ArenaManager
-  endEpisodeOnExit: 1
-  endEpisodeByEliminatingEnemies: 0
+  endEpisodeOnExit: 0
+  endEpisodeByEliminatingEnemies: 1
   roomBhv: {fileID: 381114963}
   enemyTypes:
   - prefab: {fileID: 3099337375910001205, guid: d804a763cebb7f242ab0f6ac5d1f2182,
@@ -10454,10 +10454,10 @@ MonoBehaviour:
   MaxStep: 0
   existencePenalty: 0
   deathPenalty: 0
-  damagePenalty: -0.01
+  damagePenalty: 0
   killReward: 1
-  hitReward: 0.5
-  exitReward: 0.1
+  hitReward: 0.2
+  exitReward: 0.5
   doorApproachReward: 0
   treasureReward: 0
   proximityBonus: 0
