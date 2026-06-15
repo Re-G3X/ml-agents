@@ -103,6 +103,15 @@ namespace Game.GameManager
                     OnEnemyHit();
                     collision.gameObject.GetComponent<EnemyController>().ApplyDamageEffects(collisionDirection);
                     collision.gameObject.GetComponent<HealthController>().ApplyDamage(damage, collisionDirection);
+
+                    // Arena mode: reward the agent for landing a hit
+                    if (GameManagerSingleton.Instance != null && GameManagerSingleton.Instance.arenaMode)
+                    {
+                        PlayerMLAgent agent = FindAnyObjectByType<PlayerMLAgent>();
+                        if (agent != null)
+                            agent.RegisterHit();
+                    }
+
                     DestroyBullet();
                 }
                 if (collision.gameObject.CompareTag("Shield"))

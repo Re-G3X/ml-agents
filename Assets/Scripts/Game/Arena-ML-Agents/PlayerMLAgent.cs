@@ -74,7 +74,10 @@ public class PlayerMLAgent : Unity.MLAgents.Agent
         OnAgentDeath?.Invoke();
     }
 
-    public void RegisterHit() { AddReward(hitReward); }
+    public void RegisterHit() 
+    { 
+        AddReward(hitReward); 
+    }
 
     public override void OnEpisodeBegin()
     {
