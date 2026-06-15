@@ -9764,7 +9764,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1653434786}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2f805a414d32472468f202a93597b96b, type: 3}
   m_Name: 
@@ -10052,6 +10052,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1860192600}
   m_CullTransparentMesh: 0
+--- !u!1 &1915314795
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1915314797}
+  - component: {fileID: 1915314796}
+  m_Layer: 0
+  m_Name: TrainingSpeedBoost
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1915314796
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1915314795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acbe1d60cc9ba4a44a05b1a99e45a8ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  timeScale: 5
+--- !u!4 &1915314797
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1915314795}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1927671534
 GameObject:
   m_ObjectHideFlags: 0
@@ -10215,11 +10260,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4491509972427642, guid: 8fea4dd3f18348d42a4a32bb977123cd, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 17.36
+      value: 11.11
       objectReference: {fileID: 0}
     - target: {fileID: 4491509972427642, guid: 8fea4dd3f18348d42a4a32bb977123cd, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -6.56
+      value: -3.27
       objectReference: {fileID: 0}
     - target: {fileID: 4491509972427642, guid: 8fea4dd3f18348d42a4a32bb977123cd, type: 3}
       propertyPath: m_LocalPosition.z
@@ -10409,11 +10454,11 @@ MonoBehaviour:
   MaxStep: 0
   existencePenalty: 0
   deathPenalty: 0
-  damagePenalty: 0
-  killReward: 0
-  hitReward: 0
-  exitReward: 1
-  doorApproachReward: 0.1
+  damagePenalty: -0.01
+  killReward: 1
+  hitReward: 0.5
+  exitReward: 0.1
+  doorApproachReward: 0
   treasureReward: 0
   proximityBonus: 0
 --- !u!114 &2057696085
@@ -10448,11 +10493,10 @@ MonoBehaviour:
   - Door
   - Enemy
   - Treasure
-  - Bomb
-  m_RaysPerDirection: 4
+  m_RaysPerDirection: 16
   m_MaxRayDegrees: 180
   m_SphereCastRadius: 0
-  m_RayLength: 13
+  m_RayLength: 25
   m_RayLayerMask:
     serializedVersion: 2
     m_Bits: 23041
@@ -10475,3 +10519,4 @@ SceneRoots:
   - {fileID: 381114962}
   - {fileID: 1202135049}
   - {fileID: 1653434788}
+  - {fileID: 1915314797}

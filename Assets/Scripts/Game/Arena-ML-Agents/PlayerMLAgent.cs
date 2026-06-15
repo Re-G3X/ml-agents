@@ -9,13 +9,13 @@ using Game.GameManager;
 public class PlayerMLAgent : Unity.MLAgents.Agent 
 {
     [Header("Reward Shaping (Experimental Variables)")]
-    [Tooltip("Penalty applied every frame to encourage speed.")]
+    [Tooltip("Penalty applied every frame to encourage speed (use a negative value).")]
     [SerializeField] private float existencePenalty = -0.0005f;
 
-    [Tooltip("Penalty applied when the agent dies.")]
+    [Tooltip("Penalty applied when the agent dies (use a negative value).")]
     [SerializeField] private float deathPenalty = -1.0f;
 
-    [Tooltip("Penalty applied when the agent takes damage.")]
+    [Tooltip("Penalty applied when the agent takes damage (use a negative value).")]
     [SerializeField] private float damagePenalty = -0.1f;
 
     [Tooltip("Reward applied when an enemy is defeated.")]

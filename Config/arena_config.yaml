@@ -3,7 +3,7 @@ behaviors:
     trainer_type: ppo
     hyperparameters:
       batch_size: 512    # Please note that this is optimized for my GTX 1050 Ti (4GB VRAM)
-      buffer_size: 2048
+      buffer_size: 1024  # Previously set to 2048
       learning_rate: 3.0e-4
       beta: 5.0e-3
       epsilon: 0.2
@@ -18,6 +18,6 @@ behaviors:
       extrinsic:
         gamma: 0.99
         strength: 1.0
-    max_steps: 1000000
+    max_steps: 200000
     time_horizon: 64
     summary_freq: 10000
