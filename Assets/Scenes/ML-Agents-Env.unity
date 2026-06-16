@@ -9674,7 +9674,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Project.Game::ArenaManager
   endEpisodeOnExit: 1
-  endEpisodeByEliminatingEnemies: 1
+  endEpisodeByEliminatingEnemies: 0
   roomBhv: {fileID: 381114963}
   enemyTypes:
   - prefab: {fileID: 3099337375910001205, guid: d804a763cebb7f242ab0f6ac5d1f2182,
@@ -9689,8 +9689,8 @@ MonoBehaviour:
   - prefab: {fileID: 3719394296243891228, guid: 70ca06cf753b0db4d94ad7c70ccd1724,
       type: 3}
     data: {fileID: 11400000, guid: b48b49a613866f84284bfe073fa522b8, type: 2}
-  minEnemies: 1
-  maxEnemies: 5
+  minEnemies: 3
+  maxEnemies: 3
   trainingEnemies:
   - {fileID: 0}
   - {fileID: 0}
@@ -9703,11 +9703,18 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 094ed29a468e07445b316adf4f6e2290, type: 2}
   treasurePrefab: {fileID: 6115172226947825760, guid: f0704f0159b0ba54b8e39e58b803d870,
     type: 3}
-  minTreasures: 1
-  maxTreasures: 5
+  minTreasures: 3
+  maxTreasures: 3
   treasures:
   - {fileID: 0}
-  playerSpawnPos: {x: 17.36, y: -6.56}
+  playerSpawnPos: {x: 17.21, y: -6.4}
+  randomPlayerSpawn: 1
+  playerSpawnCandidates:
+  - {x: 3.95, y: -3.27}
+  - {x: 10.68, y: 2.65}
+  - {x: 17.21, y: -6.4}
+  - {x: -0.47, y: 7.4}
+  - {x: 13.86, y: 0.24}
   cameraPosition: {x: 10.68, y: 3}
   isEpisodeActive: 0
 --- !u!4 &1558472675
@@ -9764,13 +9771,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1653434786}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2f805a414d32472468f202a93597b96b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrainedAgentEvaluator
   agent: {fileID: 2057696084}
-  numberOfEpisodes: 10
+  numberOfEpisodes: 20
   enemiesKilledTotal: 0
   treasuresCollectedTotal: 0
   deathsTotal: 0
@@ -10081,7 +10088,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acbe1d60cc9ba4a44a05b1a99e45a8ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  timeScale: 10
+  timeScale: 20
 --- !u!4 &1915314797
 Transform:
   m_ObjectHideFlags: 0
@@ -10260,11 +10267,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4491509972427642, guid: 8fea4dd3f18348d42a4a32bb977123cd, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 11.11
+      value: 17.21
       objectReference: {fileID: 0}
     - target: {fileID: 4491509972427642, guid: 8fea4dd3f18348d42a4a32bb977123cd, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -3.27
+      value: -6.4
       objectReference: {fileID: 0}
     - target: {fileID: 4491509972427642, guid: 8fea4dd3f18348d42a4a32bb977123cd, type: 3}
       propertyPath: m_LocalPosition.z
@@ -10455,8 +10462,8 @@ MonoBehaviour:
   existencePenalty: 0
   deathPenalty: 0
   damagePenalty: 0
-  killReward: 1
-  hitReward: 0.2
+  killReward: 0.5
+  hitReward: 0.5
   exitReward: 0.5
   doorApproachReward: 0
   treasureReward: 0

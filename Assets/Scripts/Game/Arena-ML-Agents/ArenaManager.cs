@@ -34,7 +34,14 @@
             [HideInInspector] public List<GameObject> treasures = new List<GameObject>(); // hidden because its populated in runtime
             
             [Header("Spawn Settings")]
-            public Vector2 playerSpawnPos = new Vector2(10.68f, 2.65f);
+            public Vector2 playerSpawnPos = new Vector2(10.68f, 2.65f);   // fallback / evaluation spawn
+
+            [Tooltip("If true, the player will spawn at a random point from the list below.")]
+            public bool randomPlayerSpawn = true;                           // turn off for evaluation
+
+            [Tooltip("Candidate spawn points used when randomPlayerSpawn is true.")]
+            [SerializeField] private List<Vector2> playerSpawnCandidates = new List<Vector2>();
+            
             [Tooltip("Fixed position for the main camera during arena episodes.")]
             public Vector2 cameraPosition = new Vector2(10.89f, 3.0f); 
 
@@ -240,12 +247,20 @@
 
             private void ForcePositions()
             {
-                // player spawn
-                if (_playerController != null)
+            // player spawn
+            if (_playerController != null)
+            {
+                Vector2 spawnPos = playerSpawnPos;   // default
+
+                if (randomPlayerSpawn && playerSpawnCandidates.Count > 0)
                 {
-                    _playerController.transform.position = playerSpawnPos;
-                    if (_playerController.TryGetComponent(out Rigidbody2D rb)) rb.linearVelocity = Vector2.zero;
+                    int idx = Random.Range(0, playerSpawnCandidates.Count);
+                    spawnPos = playerSpawnCandidates[idx];
                 }
+
+                _playerController.transform.position = spawnPos;
+                if (_playerController.TryGetComponent(out Rigidbody2D rb)) rb.linearVelocity = Vector2.zero;
+            }
                 
                 // enemy spawn
                 foreach (var enemy in trainingEnemies)
