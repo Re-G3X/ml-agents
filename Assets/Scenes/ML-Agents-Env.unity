@@ -9707,14 +9707,19 @@ MonoBehaviour:
   maxTreasures: 3
   treasures:
   - {fileID: 0}
-  playerSpawnPos: {x: 17.21, y: -6.4}
-  randomPlayerSpawn: 1
+  playerSpawnPos: {x: 10.16, y: -3.76}
+  randomPlayerSpawn: 0
   playerSpawnCandidates:
   - {x: 3.95, y: -3.27}
   - {x: 10.68, y: 2.65}
   - {x: 17.21, y: -6.4}
   - {x: -0.47, y: 7.4}
   - {x: 13.86, y: 0.24}
+  - {x: 16.12, y: 4.8}
+  - {x: -1.42, y: 3.69}
+  - {x: -1.42, y: 6.4}
+  - {x: 12.44, y: -0.06}
+  - {x: 3.1, y: 9.9}
   cameraPosition: {x: 10.68, y: 3}
   isEpisodeActive: 0
 --- !u!4 &1558472675
@@ -9777,7 +9782,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrainedAgentEvaluator
   agent: {fileID: 2057696084}
-  numberOfEpisodes: 20
+  numberOfEpisodes: 10
   enemiesKilledTotal: 0
   treasuresCollectedTotal: 0
   deathsTotal: 0
@@ -10088,7 +10093,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acbe1d60cc9ba4a44a05b1a99e45a8ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  timeScale: 20
+  timeScale: 1
 --- !u!4 &1915314797
 Transform:
   m_ObjectHideFlags: 0
@@ -10267,11 +10272,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4491509972427642, guid: 8fea4dd3f18348d42a4a32bb977123cd, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 17.21
+      value: 10.16
       objectReference: {fileID: 0}
     - target: {fileID: 4491509972427642, guid: 8fea4dd3f18348d42a4a32bb977123cd, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -6.4
+      value: -3.76
       objectReference: {fileID: 0}
     - target: {fileID: 4491509972427642, guid: 8fea4dd3f18348d42a4a32bb977123cd, type: 3}
       propertyPath: m_LocalPosition.z
@@ -10434,7 +10439,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 0}
+  m_Model: {fileID: 5022602860645237092, guid: 68a14feb8b9c99b499b07356cec60ddd, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: PlayerMLAgent
@@ -10459,11 +10464,11 @@ MonoBehaviour:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
-  existencePenalty: 0
+  existencePenalty: -0.01
   deathPenalty: 0
   damagePenalty: 0
-  killReward: 0.5
-  hitReward: 0.5
+  killReward: 0.1
+  hitReward: 1
   exitReward: 0.5
   doorApproachReward: 0
   treasureReward: 0

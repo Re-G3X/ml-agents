@@ -13,8 +13,7 @@ namespace Game.GameManager
 {
     public class GameManagerSingleton : MonoBehaviour, ISoundEmitter
     {
-        // 1. Updated to match your actual training scene name for consistency
-        public bool IsTraining => SceneManager.GetActiveScene().name == "ML-Agents-Env";
+        public bool IsTraining => SceneManager.GetActiveScene().name == "ML-Agents-Env"; // Update this to match the training scene name for consistency
         
         public bool IsInPortuguese = false;
         public Enums.GameType GameType;
@@ -37,8 +36,8 @@ namespace Game.GameManager
 
         private void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
         {
-            // 2. Add your training scene here if you want music to play while training
-            // or leave it out if you prefer silence for better performance.
+            // Add the training scene here if music has to be played while training
+            // (leave it out if silence is preferred for better performance.
             if (scene.name == "Main" || scene.name == "ContentGenerator" || scene.name == "PlatformMain" || scene.name == "ML-Agents-Env")
             {
                 ((ISoundEmitter)this).OnSoundEmitted(this, new PlayBgmEventArgs(AudioManager.BgmTracks.MainMenuTheme));
@@ -86,7 +85,7 @@ namespace Game.GameManager
 
         public void MainMenu()
         {
-            // 3. Safety Check: Reset arenaMode if manually returning to Main
+            // Safety Check: Reset arenaMode if manually returning to Main
             // arenaMode = false; 
             
             GameStartEventHandler?.Invoke(null, EventArgs.Empty);
