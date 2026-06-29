@@ -9722,6 +9722,7 @@ MonoBehaviour:
   - {x: 3.1, y: 9.9}
   cameraPosition: {x: 10.68, y: 3}
   isEpisodeActive: 0
+  lastEpisodeSteps: 0
 --- !u!4 &1558472675
 Transform:
   m_ObjectHideFlags: 0
@@ -9782,7 +9783,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrainedAgentEvaluator
   agent: {fileID: 2057696084}
-  numberOfEpisodes: 10
+  numberOfEpisodes: 100
   enemiesKilledTotal: 0
   treasuresCollectedTotal: 0
   deathsTotal: 0
@@ -10093,7 +10094,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acbe1d60cc9ba4a44a05b1a99e45a8ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  timeScale: 5
+  timeScale: 1
 --- !u!4 &1915314797
 Transform:
   m_ObjectHideFlags: 0
@@ -10473,7 +10474,6 @@ MonoBehaviour:
   doorApproachReward: 0
   treasureReward: 0
   proximityBonus: 0
-  lastEpisodeSteps: 0
 --- !u!114 &2057696085
 MonoBehaviour:
   m_ObjectHideFlags: 0
