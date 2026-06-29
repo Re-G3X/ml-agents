@@ -10,7 +10,7 @@ public class TrainedAgentEvaluator : MonoBehaviour
     [Tooltip("Drag the Player object containing the PlayerMLAgent.cs from the arena here.")]
     public PlayerMLAgent agent;
     [Tooltip("Define the amount of episodes will be run to evaluate the trained agent's performance.")]
-    public int numberOfEpisodes = 20;
+    public int numberOfEpisodes = 100;
 
     [Header("Metrics (Calculated During Run)")]
     public int enemiesKilledTotal = 0;
@@ -47,15 +47,6 @@ public class TrainedAgentEvaluator : MonoBehaviour
         StartCoroutine(RunEvaluation());
     }
 
-    void Update()
-    {
-        // Count steps only while an episode is active
-        if (arenaManager != null && arenaManager.isEpisodeActive)
-        {
-            episodeSteps++;
-        }
-    }
-
     private IEnumerator RunEvaluation()
     {
         for (int i = 0; i < numberOfEpisodes; i++)
@@ -72,8 +63,11 @@ public class TrainedAgentEvaluator : MonoBehaviour
             episodeEndedInDeath = false;
             episodeEndedInExit = false;
 
-            // wait until the episode ends (flag becomes false)
+            // Wait until the episode ends (flag becomes false)
             yield return new WaitWhile(() => arenaManager != null && arenaManager.isEpisodeActive);
+
+            // Capture final step count for this episode
+            episodeSteps = arenaManager.lastEpisodeSteps;
 
             // Accumulate totals.
             enemiesKilledTotal += episodeEnemyKills;
@@ -93,10 +87,16 @@ public class TrainedAgentEvaluator : MonoBehaviour
     {
         float n = numberOfEpisodes;
         Debug.Log($"--- Metrics over {n} episodes ---");
+        Debug.Log($"Total enemies killed: {enemiesKilledTotal}");
+        Debug.Log($"Total treasures collected: {treasuresCollectedTotal}");
+        Debug.Log($"Total deaths: {deathsTotal}");
+        Debug.Log($"Total steps: {stepsTotal}");
+        Debug.Log($"Successful exits: {successfulExits}/{numberOfEpisodes}");
+        Debug.Log($"--------------------------------------------------");
+        Debug.Log($"Averages (for quick reference):");
         Debug.Log($"Avg. enemies killed: {enemiesKilledTotal / n:F2}");
         Debug.Log($"Avg. treasures collected: {treasuresCollectedTotal / n:F2}");
         Debug.Log($"Avg. deaths: {deathsTotal / n:F2}");
         Debug.Log($"Avg. steps: {stepsTotal / n:F2}");
-        Debug.Log($"Successful exits: {successfulExits}/{numberOfEpisodes}");
     }
 }

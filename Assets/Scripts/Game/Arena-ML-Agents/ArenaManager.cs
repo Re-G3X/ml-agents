@@ -58,6 +58,7 @@
             private PlayerMLAgent _playerAgent; 
             private bool _isResetting = false;
             [HideInInspector] public bool isEpisodeActive = false; // for PersonaEvaluator.cs to calculate episodes
+            [HideInInspector] public int lastEpisodeSteps = 0;
             public event System.Action OnEnemyKilled; // to warn personaevaluator.cs about enemies killed
 
             void OnEnable()
@@ -222,6 +223,11 @@
             private IEnumerator EndEpisodeAndReset()
             {
                 isEpisodeActive = false;
+                
+                // Captures the steps before EndEpisode resets them
+                if (_playerAgent != null)
+                    lastEpisodeSteps = _playerAgent.StepCount;
+                
                 _playerAgent?.EndEpisode();
                 yield return null;
                 ResetTrainingCycle();
