@@ -1,5 +1,15 @@
-Ongoing integration of ML-Agents for RL testing/development within the Overlord project.
+╔══════════════════════════════════════════════════════════════╗
+║                OVERLORD ML-AGENTS INTEGRATION                ║
+╚══════════════════════════════════════════════════════════════╝
 
+  Ongoing integration of ML‑Agents for RL testing/development within
+  the Overlord project.  For the scientific protocol, persona definitions,
+  reward design, curriculum schedules, and full experimental results,
+  please refer to the accompanying paper.
+
+██████████████████████████████████████████████████████████████████
+██                   T E C H   S T A C K                        ██
+██████████████████████████████████████████████████████████████████
 ## Tech Stack
 - **Unity Version:** 6000.3.11f1
 - **Python Version:** 3.10.11
