@@ -1,6 +1,6 @@
-╔══════════════════════════════════════════════════════════════╗\
-║                OVERLORD ML-AGENTS INTEGRATION                ║\
-╚══════════════════════════════════════════════════════════════╝\
+╔════════════════════════════════╗ \
+║ OVERLORD ML-AGENTS INTEGRATION ║ \
+╚════════════════════════════════╝ \
 
   Ongoing integration of ML‑Agents for RL testing/development within
   the Overlord project.  For the scientific protocol, persona definitions,
