@@ -16,10 +16,10 @@ please refer to the accompanying paper.
 ## Getting Started
 
 After cloning the repository, open the project in Unity (matching the versions listed under **Tech Stack**).
-Two scenes are required; the flow is:
+Two scenes are essential; the flow is:
 
 1. `Assets/Scenes/Main.unity` – initialises core Overlord systems, then loads the arena.
-2. `ML-Agents-Env.unity` – the actual training/evaluation arena.
+2. `Assets/Scenes/ML-Agents-Env.unity` – the actual training/evaluation arena.
 
 ### 1. Main scene – enable Arena Mode
 
