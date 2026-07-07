@@ -16,7 +16,7 @@ please refer to the accompanying paper.
 ## Getting Started
 
 After cloning the repository, open the project in Unity (matching the versions listed under **Tech Stack**).
-Two scenes are essential; the flow is:
+Two scenes are essential<sup>1</sup>; the flow is:
 
 1. `Assets/Scenes/Main.unity` – initialises core Overlord systems, then loads the arena.
 2. `Assets/Scenes/ML-Agents-Env.unity` – the actual training/evaluation arena.
@@ -113,3 +113,5 @@ The following packages are already within the Unity project, but they are the ma
 | 1 | **MyBox** | `https://github.com/Deadcows/mybox.git#1.7.0` |
 | 2 | **Reorderable List** | `https://github.com/cfoulston/Unity-Reorderable-List.git#1.0.1` |
 | 3 | **Dialogue Module** | `https://github.com/FellowshipOfTheGame/DialogueModule.git#upm` |
+
+<sup>1</sup> The Main scene has to be loaded in the hierarchy when running the project, the ML-Agents-Env can be loaded alongside Main, but its not mandatory.
