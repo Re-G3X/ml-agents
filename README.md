@@ -54,7 +54,9 @@ On the loaded `ML-Agents-Env` scene, set these two flags to bypass PCG and use t
 #### Player GameObject components
 
 - **Player ML Agent (Script)** – reward weights (hover for tooltips), max steps (not yet implemented).
-- **Ray Perception Sensor 2D** – the agent’s 360° vision (32 rays, 3 detectable tags).
+  - The exact weight values for each persona are given in the accompanying paper.
+  - Two personas (Monster Killer, Treasure Collector) used a curriculum; the curriculum is controlled via `ArenaManager`’s **Episode Control**, **Training Entities** and **Treasure Settings**.
+- **Ray Perception Sensor 2D** – the agent’s 360° vision, comprising 32 rays (16 per direction, 180° arc each) that detect three tags: `Door`, `Enemy`, `Treasure`.
 - **Behavior Parameters** – set **Model** to a `.onnx` file (inference) or leave empty for training.
 - Other components handle movement (`PlayerMovement`), shooting (`PlayerShot`), health (`HealthController`), etc.
 
@@ -62,6 +64,9 @@ On the loaded `ML-Agents-Env` scene, set these two flags to bypass PCG and use t
 
 - **Missing Script Checker** – flags broken references; useful when debugging, otherwise can be disabled.
 - **Training Speed Boost** – speeds up rendering (both in play and training mode). High values (e.g., 20–100) may cause physics glitches, use with care.
+
+### 5. Pretrained Models
+Under `Assets/TrainedAgents` you’ll find the `.onnx` checkpoints for all five personas: Baseline, Runner, Survivalist, Monster Killer, and Treasure Collector.
 
 ## Environment Setup
 To ensure reproducibility and avoid version conflicts, follow these steps using [Miniconda](https://docs.anaconda.com/miniconda/):
@@ -96,13 +101,18 @@ Since each ray outputs 5 floats (hit fraction, miss indicator, one‑hot tag), t
 - Discrete (1): Shooting (0: Idle, 1: Up, 2: Down, 3: Left, 4: Right)
 
 ## Training & Monitoring
-To maintain reproducibility, always run training from the project root using the provided configuration:
+Training was performed with Unity’s default random initialization (no explicit seed was fixed).  Re‑running training will therefore produce different policies, especially since enemy and treasure spawns are randomized each episode.  However, the final policies provided in `Assets/TrainedAgents/` are deterministic and fully reproducible.
+
+Always run training from the project root using the provided configuration:
 
 ### Start Training:
-```mlagents-learn Config/arena_config.yaml --run-id=Overlord_Alpha_01 --force```
+```mlagents-learn Config/arena_config.yaml --run-id=Name_Chosen_ID_Here --force```
 
 ### Monitor with TensorBoard:
 ```tensorboard --logdir Config/results```
+
+### Evaluating a trained agent
+To evaluate a trained policy, use the **TrainedAgentEvaluator** GameObject. Attach the Player GameObject to the `Agent` field, choose the number of evaluation episodes, and make sure the agent’s `Behavior Parameters` component has the desired `.onnx` model loaded with `Behavior Type` set to `Inference Only`. While the agent plays, per‑episode metrics are printed to the console and also accumulated in the TrainedAgentEvaluator’s inspector.
 
 ## Overlord's Dependency Chain
 The following packages are already within the Unity project, but they are the main packages necessary for Overlord to work seamlessly.
