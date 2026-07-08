@@ -1,9 +1,7 @@
 # Overlord ML-Agents Integration
 
-Ongoing integration of ML‑Agents for RL testing/development within
-the Overlord project.  For the scientific protocol, persona definitions,
-reward design, curriculum schedules, and full experimental results,
-please refer to the accompanying paper.
+Integration of ML‑Agents for RL testing/development within the Overlord project.  For the scientific protocol, persona definitions,
+reward design, curriculum schedules, and full experimental results, please refer to the accompanying paper (to be published).
 
 ## Tech Stack
 - **Unity Version:** 6000.3.11f1
@@ -12,6 +10,16 @@ please refer to the accompanying paper.
 - **ML-Agents Unity Package Version:** 4.0.3
 - **ML-Agents Python Package Version:** 1.1.0
 - **Windows Version:** 10 Pro x64
+
+## Overlord's Dependency Chain
+The following packages are already within the Unity project, but they are the main packages necessary for Overlord to work seamlessly.
+
+### External Dependencies
+| Order | Package Name | Git URL |
+| :--- | :--- | :--- |
+| 1 | **MyBox** | `https://github.com/Deadcows/mybox.git#1.7.0` |
+| 2 | **Reorderable List** | `https://github.com/cfoulston/Unity-Reorderable-List.git#1.0.1` |
+| 3 | **Dialogue Module** | `https://github.com/FellowshipOfTheGame/DialogueModule.git#upm` |
 
 ## Getting Started
 
@@ -93,15 +101,5 @@ Always run training from the project root using the provided configuration:
 
 ### Evaluating a trained agent
 To evaluate a trained policy, use the **TrainedAgentEvaluator** GameObject. Attach the Player GameObject to the `Agent` field, choose the number of evaluation episodes, and make sure the agent’s `Behavior Parameters` component has the desired `.onnx` model loaded with `Behavior Type` set to `Inference Only`. While the agent plays, per‑episode metrics are printed to the console and also accumulated in the TrainedAgentEvaluator’s inspector.
-
-## Overlord's Dependency Chain
-The following packages are already within the Unity project, but they are the main packages necessary for Overlord to work seamlessly.
-
-### External Dependencies
-| Order | Package Name | Git URL |
-| :--- | :--- | :--- |
-| 1 | **MyBox** | `https://github.com/Deadcows/mybox.git#1.7.0` |
-| 2 | **Reorderable List** | `https://github.com/cfoulston/Unity-Reorderable-List.git#1.0.1` |
-| 3 | **Dialogue Module** | `https://github.com/FellowshipOfTheGame/DialogueModule.git#upm` |
 
 <sup>1</sup> The Main scene has to be loaded in the hierarchy when running the project, the ML-Agents-Env can be loaded alongside Main, but its not mandatory.
