@@ -21,13 +21,13 @@ Two scenes are essential<sup>1</sup>; the flow is:
 1. `Assets/Scenes/Main.unity` – initialises core Overlord systems, then loads the arena.
 2. `Assets/Scenes/ML-Agents-Env.unity` – the actual training/evaluation arena.
 
-### 1. Main scene – enable Arena Mode
+### 1. Scene: Main – enable Arena Mode
 
 - In the **Game Manager** GameObject, find the `Game Manager Singleton` component.
 - Tick **Arena Mode** so the procedural generation shortcuts are active.
 - The Main scene automatically destroys itself after boot and loads `ML-Agents-Env`.
 
-### 2. ML-Agents-Env – essential flags
+### 2. Scene: ML-Agents-Env – essential flags
 
 On the loaded `ML-Agents-Env` scene, set these two flags to bypass PCG and use the fixed arena:
 
