@@ -86,7 +86,7 @@ Training was performed with Unity’s default random initialization (no explicit
 Always run training from the project root using the provided configuration:
 
 ### Start Training:
-```mlagents-learn Config/arena_config.yaml --run-id=Name_Chosen_ID_Here --force```
+```mlagents-learn Config/arena_config.yaml --run-id=Your_Chosen_ID_Here --force```
 
 ### Monitor with TensorBoard:
 ```tensorboard --logdir Config/results```
