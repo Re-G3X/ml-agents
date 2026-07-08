@@ -80,26 +80,6 @@ conda env create -f environment.yaml
 # 3. Activate the environment
 conda activate arena_training
 ```
-
-## Observation & Action Space
-### Observation Space
-The agent (PlayerMLAgent) receives a hybrid observation:
-
-• A single health‑ratio scalar (currentHealth / maxHealth).
-• A 360° spatial representation from a 2D Ray Perception Sensor: 
-  32 rays evenly distributed around the agent.
-
-Max ray length: 25 world units.
-
-Detectable tags: Door, Enemy, Treasure.
-
-Since each ray outputs 5 floats (hit fraction, miss indicator, one‑hot tag), the total observation size = 161 real‑valued features.
-
-### Action Space:
-
-- Continuous (2): Movement (Horizontal, Vertical)
-- Discrete (1): Shooting (0: Idle, 1: Up, 2: Down, 3: Left, 4: Right)
-
 ## Training & Monitoring
 Training was performed with Unity’s default random initialization (no explicit seed was fixed).  Re‑running training will therefore produce different policies, especially since enemy and treasure spawns are randomized each episode.  However, the final policies provided in `Assets/TrainedAgents/` are deterministic and fully reproducible.
 
