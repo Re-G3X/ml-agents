@@ -1,7 +1,6 @@
 # Overlord ML-Agents Integration
 
-Integration of ML‑Agents for RL testing/development within the Overlord project.  For the scientific protocol, persona definitions,
-reward design, curriculum schedules, and full experimental results, please refer to the accompanying paper (to be published).
+Integration of ML‑Agents for RL testing/development within the Overlord project. 
 
 ## Tech Stack
 - **Unity Version:** 6000.3.11f1
